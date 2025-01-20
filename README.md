@@ -132,6 +132,7 @@ y = a_1 + a_2 * x + a_3 * x^2 + a_4 * x^3
 
 ### Boxplots
 A boxplot groups a continuous variable by a categorical variable, displaying summary statistics for each group. For more information, refer to the [Boxplot Guide](https://rpubs.com/Davo2812/1102821).
+![Boxplot.png](Boxplot.png)
 
 ### EDA Questions
 1. What type of variation occurs within my variables?
@@ -156,4 +157,3 @@ y ~ x
 ```
 - **`y`**: Dependent variable (response/outcome).
 - **`x`**: Independent variable (predictor/explanatory variable).
-```
