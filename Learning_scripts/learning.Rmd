@@ -18,5 +18,144 @@ When you save the notebook, an HTML file containing the code and output will be 
 The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 
 
+```{r}
 library(tidyverse)
+1 + 4
+
+dput(mtcars)
+
+```
+
+```{r}
+
+
+```
+
+<!--
+
+16th Jan 2025:
+
+pipe operator:
+|>
+%>% 
+both are same
+mutate means adding a column give the quadratic equation formula in mutate
+truth data i obtained
+Machine learning task:
+try and recover the function relating to x input and the y output
+
+linear model function  lm()
+dplyr::select(x, y)  use the select function without importing the entire package
+preface -> workflow basics
+read chapter then go through lecture slides
+-->
+```{r}
+mod1 <- lm(formula = y ~ x,data = my_train)
+```
+
+<!--
+y is the output and x is the input function
+data is the dataframe
+= sign for inside arguments
+<- variable assigning
+
+df <- tibble()
+rm(df)
+-->
+
+```{r}
+summary(model)
+```
+
+<!--
+statistically significance
+- if 95% confidence includes 0 then there is no relation between the input and output
+- looking for 95% confidence which doesn't include 0 then we get the evidence to reject the hypothesis
+
+
+coefplot::coefplot(mod1) + lablels + theme
+
+
+uses ggplot code because we can add the components
+
+use function poly() that converts what degree polynomial 
+
+mod1 <- lm(formula = y ~ x + I(x^2),data = my_train)
+
+which model is better?
+performance metric used to compare these models
+one important metric - sum of squared errors (how far away the error from estimated values)
+we should minimize the sum of squared errors
+
+mod1 is the trained object
+mod1 is trained on my_train
+rmse()
+modelr::rmse(mod1, my_train)
+
+The 8th degree polynomial has the lowest RMSE!!
+facet 
+more degrees of polynomial given then always we decrease the training error
+
+R-squared is the squared correlation coefficient between the model and the coefficients
+modelr::rsquare(mod2, my_train)
+
+it ranges from 0 to 1
+best r-square should be 1 that is closer to 1
+
+tibble(x = seq(-2.1, 2.1, length.out = 51))
+x is the new column
+
+generating evenly spaced test points
+
+to predict the model
+predict() function
+first object - model, second parameter - test set
+
+predict is predicting based on the columns
+
+scales
+
+bias variance trade-off
+
+data splitting to approximate "new" data
+
+create the data split
+
+we might become unlucky because of some minimal outlier point which makes the error down so that is why we train the model multiple times with some changes, 7th degree polynomial seems best than 8th degree polynomial among the models due to that unlucky outlier which reduced the error.
+resampling:
+common approaches of resampling:
+1. Bootstrap - resampling with replacement
+2. K-fold cross validation - ensure each observation is used as a test point once
+
+how many folds? as many as the compute handles
+
+overfit underfit
+we need to find the balance between this overfit and underfit.
+smaller models do not have felxibility to adapt with teh outliers.
+
+one-standard error rule
+since the models are there in 1 standard deviation then we can take simpler model
+
+caret package to handle assignment
+
+
+-->
+
+```{r}
+str(iris)
+
+iris[iris$Sepal.Length > 5.8, ]
+
+iris[iris$Species == "setosa", ]
+
+iris %>% names()
+iris |> str()
+iris %>% names() %>% length()
+df <- data.frame(iris)
+df
+```
+
+
+
+
 

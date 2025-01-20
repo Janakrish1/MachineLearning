@@ -1774,10 +1774,185 @@ press <em>Cmd+Shift+K</em> to preview the HTML file).</p>
 editor. Consequently, unlike <em>Knit</em>, <em>Preview</em> does not
 run any R code chunks. Instead, the output of the chunk when it was last
 run in the editor is displayed.</p>
-<p>library(tidyverse)</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZHB1dChtdGNhcnMpXG5cbmBgYCJ9 -->
+<pre class="r"><code>dput(mtcars)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RydWN0dXJlKGxpc3QobXBnID0gYygyMSwgMjEsIDIyLjgsIDIxLjQsIDE4LjcsIDE4LjEsIDE0LjMsIFxuMjQuNCwgMjIuOCwgMTkuMiwgMTcuOCwgMTYuNCwgMTcuMywgMTUuMiwgMTAuNCwgMTAuNCwgMTQuNywgMzIuNCwgXG4zMC40LCAzMy45LCAyMS41LCAxNS41LCAxNS4yLCAxMy4zLCAxOS4yLCAyNy4zLCAyNiwgMzAuNCwgMTUuOCwgXG4xOS43LCAxNSwgMjEuNCksIGN5bCA9IGMoNiwgNiwgNCwgNiwgOCwgNiwgOCwgNCwgNCwgNiwgNiwgOCwgXG44LCA4LCA4LCA4LCA4LCA0LCA0LCA0LCA0LCA4LCA4LCA4LCA4LCA0LCA0LCA0LCA4LCA2LCA4LCA0KSwgXG4gICAgZGlzcCA9IGMoMTYwLCAxNjAsIDEwOCwgMjU4LCAzNjAsIDIyNSwgMzYwLCAxNDYuNywgMTQwLjgsIFxuICAgIDE2Ny42LCAxNjcuNiwgMjc1LjgsIDI3NS44LCAyNzUuOCwgNDcyLCA0NjAsIDQ0MCwgNzguNywgNzUuNywgXG4gICAgNzEuMSwgMTIwLjEsIDMxOCwgMzA0LCAzNTAsIDQwMCwgNzksIDEyMC4zLCA5NS4xLCAzNTEsIDE0NSwgXG4gICAgMzAxLCAxMjEpLCBocCA9IGMoMTEwLCAxMTAsIDkzLCAxMTAsIDE3NSwgMTA1LCAyNDUsIDYyLCA5NSwgXG4gICAgMTIzLCAxMjMsIDE4MCwgMTgwLCAxODAsIDIwNSwgMjE1LCAyMzAsIDY2LCA1MiwgNjUsIDk3LCAxNTAsIFxuICAgIDE1MCwgMjQ1LCAxNzUsIDY2LCA5MSwgMTEzLCAyNjQsIDE3NSwgMzM1LCAxMDkpLCBkcmF0ID0gYygzLjksIFxuICAgIDMuOSwgMy44NSwgMy4wOCwgMy4xNSwgMi43NiwgMy4yMSwgMy42OSwgMy45MiwgMy45MiwgMy45MiwgXG4gICAgMy4wNywgMy4wNywgMy4wNywgMi45MywgMywgMy4yMywgNC4wOCwgNC45MywgNC4yMiwgMy43LCAyLjc2LCBcbiAgICAzLjE1LCAzLjczLCAzLjA4LCA0LjA4LCA0LjQzLCAzLjc3LCA0LjIyLCAzLjYyLCAzLjU0LCA0LjExXG4gICAgKSwgd3QgPSBjKDIuNjIsIDIuODc1LCAyLjMyLCAzLjIxNSwgMy40NCwgMy40NiwgMy41NywgMy4xOSwgXG4gICAgMy4xNSwgMy40NCwgMy40NCwgNC4wNywgMy43MywgMy43OCwgNS4yNSwgNS40MjQsIDUuMzQ1LCAyLjIsIFxuICAgIDEuNjE1LCAxLjgzNSwgMi40NjUsIDMuNTIsIDMuNDM1LCAzLjg0LCAzLjg0NSwgMS45MzUsIDIuMTQsIFxuICAgIDEuNTEzLCAzLjE3LCAyLjc3LCAzLjU3LCAyLjc4KSwgcXNlYyA9IGMoMTYuNDYsIDE3LjAyLCAxOC42MSwgXG4gICAgMTkuNDQsIDE3LjAyLCAyMC4yMiwgMTUuODQsIDIwLCAyMi45LCAxOC4zLCAxOC45LCAxNy40LCAxNy42LCBcbiAgICAxOCwgMTcuOTgsIDE3LjgyLCAxNy40MiwgMTkuNDcsIDE4LjUyLCAxOS45LCAyMC4wMSwgMTYuODcsIFxuICAgIDE3LjMsIDE1LjQxLCAxNy4wNSwgMTguOSwgMTYuNywgMTYuOSwgMTQuNSwgMTUuNSwgMTQuNiwgMTguNlxuICAgICksIHZzID0gYygwLCAwLCAxLCAxLCAwLCAxLCAwLCAxLCAxLCAxLCAxLCAwLCAwLCAwLCAwLCAwLCBcbiAgICAwLCAxLCAxLCAxLCAxLCAwLCAwLCAwLCAwLCAxLCAwLCAxLCAwLCAwLCAwLCAxKSwgYW0gPSBjKDEsIFxuICAgIDEsIDEsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDEsIDEsIDEsIFxuICAgIDAsIDAsIDAsIDAsIDAsIDEsIDEsIDEsIDEsIDEsIDEsIDEpLCBnZWFyID0gYyg0LCA0LCA0LCAzLCBcbiAgICAzLCAzLCAzLCA0LCA0LCA0LCA0LCAzLCAzLCAzLCAzLCAzLCAzLCA0LCA0LCA0LCAzLCAzLCAzLCBcbiAgICAzLCAzLCA0LCA1LCA1LCA1LCA1LCA1LCA0KSwgY2FyYiA9IGMoNCwgNCwgMSwgMSwgMiwgMSwgNCwgXG4gICAgMiwgMiwgNCwgNCwgMywgMywgMywgNCwgNCwgNCwgMSwgMiwgMSwgMSwgMiwgMiwgNCwgMiwgMSwgXG4gICAgMiwgMiwgNCwgNiwgOCwgMikpLCByb3cubmFtZXMgPSBjKFwiTWF6ZGEgUlg0XCIsIFwiTWF6ZGEgUlg0IFdhZ1wiLCBcblwiRGF0c3VuIDcxMFwiLCBcIkhvcm5ldCA0IERyaXZlXCIsIFwiSG9ybmV0IFNwb3J0YWJvdXRcIiwgXCJWYWxpYW50XCIsIFxuXCJEdXN0ZXIgMzYwXCIsIFwiTWVyYyAyNDBEXCIsIFwiTWVyYyAyMzBcIiwgXCJNZXJjIDI4MFwiLCBcIk1lcmMgMjgwQ1wiLCBcblwiTWVyYyA0NTBTRVwiLCBcIk1lcmMgNDUwU0xcIiwgXCJNZXJjIDQ1MFNMQ1wiLCBcIkNhZGlsbGFjIEZsZWV0d29vZFwiLCBcblwiTGluY29sbiBDb250aW5lbnRhbFwiLCBcIkNocnlzbGVyIEltcGVyaWFsXCIsIFwiRmlhdCAxMjhcIiwgXCJIb25kYSBDaXZpY1wiLCBcblwiVG95b3RhIENvcm9sbGFcIiwgXCJUb3lvdGEgQ29yb25hXCIsIFwiRG9kZ2UgQ2hhbGxlbmdlclwiLCBcIkFNQyBKYXZlbGluXCIsIFxuXCJDYW1hcm8gWjI4XCIsIFwiUG9udGlhYyBGaXJlYmlyZFwiLCBcIkZpYXQgWDEtOVwiLCBcIlBvcnNjaGUgOTE0LTJcIiwgXG5cIkxvdHVzIEV1cm9wYVwiLCBcIkZvcmQgUGFudGVyYSBMXCIsIFwiRmVycmFyaSBEaW5vXCIsIFwiTWFzZXJhdGkgQm9yYVwiLCBcblwiVm9sdm8gMTQyRVwiKSwgY2xhc3MgPSBcImRhdGEuZnJhbWVcIilcbiJ9 -->
+<pre><code>structure(list(mpg = c(21, 21, 22.8, 21.4, 18.7, 18.1, 14.3, 
+24.4, 22.8, 19.2, 17.8, 16.4, 17.3, 15.2, 10.4, 10.4, 14.7, 32.4, 
+30.4, 33.9, 21.5, 15.5, 15.2, 13.3, 19.2, 27.3, 26, 30.4, 15.8, 
+19.7, 15, 21.4), cyl = c(6, 6, 4, 6, 8, 6, 8, 4, 4, 6, 6, 8, 
+8, 8, 8, 8, 8, 4, 4, 4, 4, 8, 8, 8, 8, 4, 4, 4, 8, 6, 8, 4), 
+    disp = c(160, 160, 108, 258, 360, 225, 360, 146.7, 140.8, 
+    167.6, 167.6, 275.8, 275.8, 275.8, 472, 460, 440, 78.7, 75.7, 
+    71.1, 120.1, 318, 304, 350, 400, 79, 120.3, 95.1, 351, 145, 
+    301, 121), hp = c(110, 110, 93, 110, 175, 105, 245, 62, 95, 
+    123, 123, 180, 180, 180, 205, 215, 230, 66, 52, 65, 97, 150, 
+    150, 245, 175, 66, 91, 113, 264, 175, 335, 109), drat = c(3.9, 
+    3.9, 3.85, 3.08, 3.15, 2.76, 3.21, 3.69, 3.92, 3.92, 3.92, 
+    3.07, 3.07, 3.07, 2.93, 3, 3.23, 4.08, 4.93, 4.22, 3.7, 2.76, 
+    3.15, 3.73, 3.08, 4.08, 4.43, 3.77, 4.22, 3.62, 3.54, 4.11
+    ), wt = c(2.62, 2.875, 2.32, 3.215, 3.44, 3.46, 3.57, 3.19, 
+    3.15, 3.44, 3.44, 4.07, 3.73, 3.78, 5.25, 5.424, 5.345, 2.2, 
+    1.615, 1.835, 2.465, 3.52, 3.435, 3.84, 3.845, 1.935, 2.14, 
+    1.513, 3.17, 2.77, 3.57, 2.78), qsec = c(16.46, 17.02, 18.61, 
+    19.44, 17.02, 20.22, 15.84, 20, 22.9, 18.3, 18.9, 17.4, 17.6, 
+    18, 17.98, 17.82, 17.42, 19.47, 18.52, 19.9, 20.01, 16.87, 
+    17.3, 15.41, 17.05, 18.9, 16.7, 16.9, 14.5, 15.5, 14.6, 18.6
+    ), vs = c(0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 
+    0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1), am = c(1, 
+    1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 
+    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1), gear = c(4, 4, 4, 3, 
+    3, 3, 3, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3, 3, 3, 
+    3, 3, 4, 5, 5, 5, 5, 5, 4), carb = c(4, 4, 1, 1, 2, 1, 4, 
+    2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1, 2, 2, 4, 2, 1, 
+    2, 2, 4, 6, 8, 2)), row.names = c(&quot;Mazda RX4&quot;, &quot;Mazda RX4 Wag&quot;, 
+&quot;Datsun 710&quot;, &quot;Hornet 4 Drive&quot;, &quot;Hornet Sportabout&quot;, &quot;Valiant&quot;, 
+&quot;Duster 360&quot;, &quot;Merc 240D&quot;, &quot;Merc 230&quot;, &quot;Merc 280&quot;, &quot;Merc 280C&quot;, 
+&quot;Merc 450SE&quot;, &quot;Merc 450SL&quot;, &quot;Merc 450SLC&quot;, &quot;Cadillac Fleetwood&quot;, 
+&quot;Lincoln Continental&quot;, &quot;Chrysler Imperial&quot;, &quot;Fiat 128&quot;, &quot;Honda Civic&quot;, 
+&quot;Toyota Corolla&quot;, &quot;Toyota Corona&quot;, &quot;Dodge Challenger&quot;, &quot;AMC Javelin&quot;, 
+&quot;Camaro Z28&quot;, &quot;Pontiac Firebird&quot;, &quot;Fiat X1-9&quot;, &quot;Porsche 914-2&quot;, 
+&quot;Lotus Europa&quot;, &quot;Ford Pantera L&quot;, &quot;Ferrari Dino&quot;, &quot;Maserati Bora&quot;, 
+&quot;Volvo 142E&quot;), class = &quot;data.frame&quot;)</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!--
+
+16th Jan 2025:
+
+pipe operator:
+|>
+%>% 
+both are same
+mutate means adding a column give the quadratic equation formula in mutate
+truth data i obtained
+Machine learning task:
+try and recover the function relating to x input and the y output
+
+linear model function  lm()
+dplyr::select(x, y)  use the select function without importing the entire package
+preface -> workflow basics
+read chapter then go through lecture slides
+-->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kMSA8LSBsbShmb3JtdWxhID0geSB+IHgsZGF0YSA9IG15X3RyYWluKVxuYGBgIn0= -->
+<pre class="r"><code>mod1 &lt;- lm(formula = y ~ x,data = my_train)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!--
+y is the output and x is the input function
+data is the dataframe
+= sign for inside arguments
+<- variable assigning
+
+df <- tibble()
+rm(df)
+-->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWFyeShtb2RlbClcbmBgYCJ9 -->
+<pre class="r"><code>summary(model)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!--
+statistically significance
+- if 95% confidence includes 0 then there is no relation between the input and output
+- looking for 95% confidence which doesn't include 0 then we get the evidence to reject the hypothesis
+
+
+coefplot::coefplot(mod1) + lablels + theme
+
+
+uses ggplot code because we can add the components
+
+use function poly() that converts what degree polynomial 
+
+mod1 <- lm(formula = y ~ x + I(x^2),data = my_train)
+
+which model is better?
+performance metric used to compare these models
+one important metric - sum of squared errors (how far away the error from estimated values)
+we should minimize the sum of squared errors
+
+mod1 is the trained object
+mod1 is trained on my_train
+rmse()
+modelr::rmse(mod1, my_train)
+
+The 8th degree polynomial has the lowest RMSE!!
+facet 
+more degrees of polynomial given then always we decrease the training error
+
+R-squared is the squared correlation coefficient between the model and the coefficients
+modelr::rsquare(mod2, my_train)
+
+it ranges from 0 to 1
+best r-square should be 1 that is closer to 1
+
+tibble(x = seq(-2.1, 2.1, length.out = 51))
+x is the new column
+
+generating evenly spaced test points
+
+to predict the model
+predict() function
+first object - model, second parameter - test set
+
+predict is predicting based on the columns
+
+scales
+
+bias variance trade-off
+
+data splitting to approximate "new" data
+
+create the data split
+
+we might become unlucky because of some minimal outlier point which makes the error down so that is why we train the model multiple times with some changes, 7th degree polynomial seems best than 8th degree polynomial among the models due to that unlucky outlier which reduced the error.
+resampling:
+common approaches of resampling:
+1. Bootstrap - resampling with replacement
+2. K-fold cross validation - ensure each observation is used as a test point once
+
+how many folds? as many as the compute handles
+
+overfit underfit
+we need to find the balance between this overfit and underfit.
+smaller models do not have felxibility to adapt with teh outliers.
+
+one-standard error rule
+since the models are there in 1 standard deviation then we can take simpler model
+
+caret package to handle assignment
+
+
+-->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MTUwLCJuY29sIjo1LCJzdW1tYXJ5Ijp7IkRlc2NyaXB0aW9uIjpbImRmIFsxNTAgw5cgNV0iXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBOTJZejI0YlZSVEdyejFqeDNiYzRQeHpIVGN0VHhCTHBSdDI5UUt4WW9Fb2lHNEhaNUtPTUdQTGRsT1dQRVVrZUpNK0FoSmRkZFVkRWkrUUNvU29xQXd6bnZPN2tNOGR1ZXVNWkIyZlAvYzczem4zenIzWC91S1R4dzlhajF2T3VjQ0ZZY1VGdGV5cnEzMzE1YWNuSHpzWFZqT2w0a0xYek9YM1dkQis3czArTzlubmNuaHd0bnFHK3ovbXowL0R2Vi95NThWd3ord0hidlVNRC9HTGZkZnNqQ2R1LzhIcThYTFg1RzJUWGN0RFBEeXdvNnZmNTRlMzRjSEhTM0NveHlUeEh0ZnNYUnRISGVDb2ZWZjRFTGNuL2ZBOGxLZlVjU2o4ajAwZUdjNGRrL0Rvdzh0NEg5Rm5pK3ZEaS9vdC9yYjVlNmIzNkxmSlBuMHduWG5xcVIwYzA4bnZkZUZ4eC96Zzk0US9kU0Y5WGxsMzZIMnBHMTZLMDVNNi9IektPa05TcDY1RDhvQnpMSFV6SC9ma1Bib3JkUitiSk43UHI3d1A1UEY5Qk4vOFNQcmgxNGZsdnllOE5UOTE2bnpodjJ2Nmh5Yng2enhybmlPWkozaVJINTM2ZEYzb3ZGSTNmRzNkK1gycmJmNkd5YWJoTnl5K2JmSUR3OXNXdVdXUytGczJIbjlEOER2eWZvTUxqeDNyQ3hJY2NPSFRFai80MjRLSHJuVmg3eGhPeCt6NGlRZUh2R1Y1cW9hajQ2aWpJVHB4MU5VU3UvSUZ2eTZTY1lITVI4M0dPK2wveGV4YkV0K1EraGhQZkNqcmcvelkwVDJlMk5IeGg1WVAzb0h3Um1xL3RSLzQ0UkZLSGFIRUs2NzJRZXRwYlJpbjZ6c1VQM3BiMXBYaWFkNm0rRmszMU1PODZIelVoYSt1SzUyUE1uMUg4UHg4bDd3SHVuNjhMckltdkZ1U256NnM0VHVlMWI3MThNOWluSmQvRlBnUC95cUN2UDN2WXJ6WDFZK09mRlB3OHY3WHB2OXVPTVNSVC9QZ1YvMUs3RXNiUno2azhpdnpsOVVCVCtXbi9VRlhTUjc0S1krU1B2NTMzN1Y1NC96dW1NNDlEVC94ekQ5K1BRL1lsenN5anZlSmN3VGNqdVFCYjUvOVh2aUJ4NzNhMzhOTjEzdXA3dXZzMytRNTBEcUZOL2orM0RHL3IwUHM5TWYzUVNTOC9mbHE4ZHdmNE1OOXM0dHU0L3JDVis5cDNGUDg3d2l6Y3ovVSs3bjY5ZDdpNzQ5bTkvZHQwZjE5a3ZsaUhrdnEwSHRZVjNpajYzMjlLL2lISmVQWCttajg5UGNCdXZ6ZWN1eGJQOXQ3dEVtK012blMzbWYxUHk4Wjk3ekUvMG9rdUNvMUh2MVhlOS9MZUw1dlBXVzgzN2UrTXI2L21iNnBieXAxUDlQOVVmVTNOdTVLN09CY0NRNDZmbzNYT0hUT25iZXlQMi9hNTVGbDU4OXI0UThPZGVrNXVPbThZRHg1MGJVL3loY0pIOU01L3psL2hzN2lyQS8rM29PZE90OUtIUGNJOTI0ODdQN2VhZmZEdFR6VjYvUGs3NUZPOEJrbmZOZDQ0YWUvUzhHclNOK3RyejV2VUZJdmRXazlTeGtmWHE5akxiLzB3Ym5nVm1hK2RQbWZYemZqVTcwaG4rQm1mSzc5c1ZvZnh4ZnhlSjU5NjZ5OFpwM0hpOGs4TXExMUVjL215V2d5bnN6TTByeEladWRKbW93aWdhdU54dEVjTkovakxCb3RzckhPTFRVOGpiNkxDYStac2Ywb25rYmp3V2R4ZXI1NFlyYnR3dloxY3VwTjdjL2p4VnBZWWZ0LzJOYWphVHhLOGlUWE1qZG5rMmNEc3VjdlhQVUh0M291aThEZ0h5bWlkUm90b3NIWkxCdnlqa0sySnRORk1ra3pzR3IrTDNWZEJsZG1ZdWc4VGZQa3B5ZWpKMC9UYjA4K3VpLytZSnFlNTBsZDhRWTVJMWtwQ1BydnRZSkdDTms2SGMrYWtxUXhYUjVIMzhSamtFL2pDL3U2ay9WZzFZTEJkSmFrQ3dyTnJQUEJZcEkxRWtzMjlWaFdwYnZsdi9UYWV1TzdGd0FBIn0= -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Sepal.Length"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Sepal.Width"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Petal.Length"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Petal.Width"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Species"],"name":[5],"type":["fctr"],"align":["left"]}],"data":[{"1":"5.1","2":"3.5","3":"1.4","4":"0.2","5":"setosa"},{"1":"4.9","2":"3.0","3":"1.4","4":"0.2","5":"setosa"},{"1":"4.7","2":"3.2","3":"1.3","4":"0.2","5":"setosa"},{"1":"4.6","2":"3.1","3":"1.5","4":"0.2","5":"setosa"},{"1":"5.0","2":"3.6","3":"1.4","4":"0.2","5":"setosa"},{"1":"5.4","2":"3.9","3":"1.7","4":"0.4","5":"setosa"},{"1":"4.6","2":"3.4","3":"1.4","4":"0.3","5":"setosa"},{"1":"5.0","2":"3.4","3":"1.5","4":"0.2","5":"setosa"},{"1":"4.4","2":"2.9","3":"1.4","4":"0.2","5":"setosa"},{"1":"4.9","2":"3.1","3":"1.5","4":"0.1","5":"setosa"},{"1":"5.4","2":"3.7","3":"1.5","4":"0.2","5":"setosa"},{"1":"4.8","2":"3.4","3":"1.6","4":"0.2","5":"setosa"},{"1":"4.8","2":"3.0","3":"1.4","4":"0.1","5":"setosa"},{"1":"4.3","2":"3.0","3":"1.1","4":"0.1","5":"setosa"},{"1":"5.8","2":"4.0","3":"1.2","4":"0.2","5":"setosa"},{"1":"5.7","2":"4.4","3":"1.5","4":"0.4","5":"setosa"},{"1":"5.4","2":"3.9","3":"1.3","4":"0.4","5":"setosa"},{"1":"5.1","2":"3.5","3":"1.4","4":"0.3","5":"setosa"},{"1":"5.7","2":"3.8","3":"1.7","4":"0.3","5":"setosa"},{"1":"5.1","2":"3.8","3":"1.5","4":"0.3","5":"setosa"},{"1":"5.4","2":"3.4","3":"1.7","4":"0.2","5":"setosa"},{"1":"5.1","2":"3.7","3":"1.5","4":"0.4","5":"setosa"},{"1":"4.6","2":"3.6","3":"1.0","4":"0.2","5":"setosa"},{"1":"5.1","2":"3.3","3":"1.7","4":"0.5","5":"setosa"},{"1":"4.8","2":"3.4","3":"1.9","4":"0.2","5":"setosa"},{"1":"5.0","2":"3.0","3":"1.6","4":"0.2","5":"setosa"},{"1":"5.0","2":"3.4","3":"1.6","4":"0.4","5":"setosa"},{"1":"5.2","2":"3.5","3":"1.5","4":"0.2","5":"setosa"},{"1":"5.2","2":"3.4","3":"1.4","4":"0.2","5":"setosa"},{"1":"4.7","2":"3.2","3":"1.6","4":"0.2","5":"setosa"},{"1":"4.8","2":"3.1","3":"1.6","4":"0.2","5":"setosa"},{"1":"5.4","2":"3.4","3":"1.5","4":"0.4","5":"setosa"},{"1":"5.2","2":"4.1","3":"1.5","4":"0.1","5":"setosa"},{"1":"5.5","2":"4.2","3":"1.4","4":"0.2","5":"setosa"},{"1":"4.9","2":"3.1","3":"1.5","4":"0.2","5":"setosa"},{"1":"5.0","2":"3.2","3":"1.2","4":"0.2","5":"setosa"},{"1":"5.5","2":"3.5","3":"1.3","4":"0.2","5":"setosa"},{"1":"4.9","2":"3.6","3":"1.4","4":"0.1","5":"setosa"},{"1":"4.4","2":"3.0","3":"1.3","4":"0.2","5":"setosa"},{"1":"5.1","2":"3.4","3":"1.5","4":"0.2","5":"setosa"},{"1":"5.0","2":"3.5","3":"1.3","4":"0.3","5":"setosa"},{"1":"4.5","2":"2.3","3":"1.3","4":"0.3","5":"setosa"},{"1":"4.4","2":"3.2","3":"1.3","4":"0.2","5":"setosa"},{"1":"5.0","2":"3.5","3":"1.6","4":"0.6","5":"setosa"},{"1":"5.1","2":"3.8","3":"1.9","4":"0.4","5":"setosa"},{"1":"4.8","2":"3.0","3":"1.4","4":"0.3","5":"setosa"},{"1":"5.1","2":"3.8","3":"1.6","4":"0.2","5":"setosa"},{"1":"4.6","2":"3.2","3":"1.4","4":"0.2","5":"setosa"},{"1":"5.3","2":"3.7","3":"1.5","4":"0.2","5":"setosa"},{"1":"5.0","2":"3.3","3":"1.4","4":"0.2","5":"setosa"},{"1":"7.0","2":"3.2","3":"4.7","4":"1.4","5":"versicolor"},{"1":"6.4","2":"3.2","3":"4.5","4":"1.5","5":"versicolor"},{"1":"6.9","2":"3.1","3":"4.9","4":"1.5","5":"versicolor"},{"1":"5.5","2":"2.3","3":"4.0","4":"1.3","5":"versicolor"},{"1":"6.5","2":"2.8","3":"4.6","4":"1.5","5":"versicolor"},{"1":"5.7","2":"2.8","3":"4.5","4":"1.3","5":"versicolor"},{"1":"6.3","2":"3.3","3":"4.7","4":"1.6","5":"versicolor"},{"1":"4.9","2":"2.4","3":"3.3","4":"1.0","5":"versicolor"},{"1":"6.6","2":"2.9","3":"4.6","4":"1.3","5":"versicolor"},{"1":"5.2","2":"2.7","3":"3.9","4":"1.4","5":"versicolor"},{"1":"5.0","2":"2.0","3":"3.5","4":"1.0","5":"versicolor"},{"1":"5.9","2":"3.0","3":"4.2","4":"1.5","5":"versicolor"},{"1":"6.0","2":"2.2","3":"4.0","4":"1.0","5":"versicolor"},{"1":"6.1","2":"2.9","3":"4.7","4":"1.4","5":"versicolor"},{"1":"5.6","2":"2.9","3":"3.6","4":"1.3","5":"versicolor"},{"1":"6.7","2":"3.1","3":"4.4","4":"1.4","5":"versicolor"},{"1":"5.6","2":"3.0","3":"4.5","4":"1.5","5":"versicolor"},{"1":"5.8","2":"2.7","3":"4.1","4":"1.0","5":"versicolor"},{"1":"6.2","2":"2.2","3":"4.5","4":"1.5","5":"versicolor"},{"1":"5.6","2":"2.5","3":"3.9","4":"1.1","5":"versicolor"},{"1":"5.9","2":"3.2","3":"4.8","4":"1.8","5":"versicolor"},{"1":"6.1","2":"2.8","3":"4.0","4":"1.3","5":"versicolor"},{"1":"6.3","2":"2.5","3":"4.9","4":"1.5","5":"versicolor"},{"1":"6.1","2":"2.8","3":"4.7","4":"1.2","5":"versicolor"},{"1":"6.4","2":"2.9","3":"4.3","4":"1.3","5":"versicolor"},{"1":"6.6","2":"3.0","3":"4.4","4":"1.4","5":"versicolor"},{"1":"6.8","2":"2.8","3":"4.8","4":"1.4","5":"versicolor"},{"1":"6.7","2":"3.0","3":"5.0","4":"1.7","5":"versicolor"},{"1":"6.0","2":"2.9","3":"4.5","4":"1.5","5":"versicolor"},{"1":"5.7","2":"2.6","3":"3.5","4":"1.0","5":"versicolor"},{"1":"5.5","2":"2.4","3":"3.8","4":"1.1","5":"versicolor"},{"1":"5.5","2":"2.4","3":"3.7","4":"1.0","5":"versicolor"},{"1":"5.8","2":"2.7","3":"3.9","4":"1.2","5":"versicolor"},{"1":"6.0","2":"2.7","3":"5.1","4":"1.6","5":"versicolor"},{"1":"5.4","2":"3.0","3":"4.5","4":"1.5","5":"versicolor"},{"1":"6.0","2":"3.4","3":"4.5","4":"1.6","5":"versicolor"},{"1":"6.7","2":"3.1","3":"4.7","4":"1.5","5":"versicolor"},{"1":"6.3","2":"2.3","3":"4.4","4":"1.3","5":"versicolor"},{"1":"5.6","2":"3.0","3":"4.1","4":"1.3","5":"versicolor"},{"1":"5.5","2":"2.5","3":"4.0","4":"1.3","5":"versicolor"},{"1":"5.5","2":"2.6","3":"4.4","4":"1.2","5":"versicolor"},{"1":"6.1","2":"3.0","3":"4.6","4":"1.4","5":"versicolor"},{"1":"5.8","2":"2.6","3":"4.0","4":"1.2","5":"versicolor"},{"1":"5.0","2":"2.3","3":"3.3","4":"1.0","5":"versicolor"},{"1":"5.6","2":"2.7","3":"4.2","4":"1.3","5":"versicolor"},{"1":"5.7","2":"3.0","3":"4.2","4":"1.2","5":"versicolor"},{"1":"5.7","2":"2.9","3":"4.2","4":"1.3","5":"versicolor"},{"1":"6.2","2":"2.9","3":"4.3","4":"1.3","5":"versicolor"},{"1":"5.1","2":"2.5","3":"3.0","4":"1.1","5":"versicolor"},{"1":"5.7","2":"2.8","3":"4.1","4":"1.3","5":"versicolor"},{"1":"6.3","2":"3.3","3":"6.0","4":"2.5","5":"virginica"},{"1":"5.8","2":"2.7","3":"5.1","4":"1.9","5":"virginica"},{"1":"7.1","2":"3.0","3":"5.9","4":"2.1","5":"virginica"},{"1":"6.3","2":"2.9","3":"5.6","4":"1.8","5":"virginica"},{"1":"6.5","2":"3.0","3":"5.8","4":"2.2","5":"virginica"},{"1":"7.6","2":"3.0","3":"6.6","4":"2.1","5":"virginica"},{"1":"4.9","2":"2.5","3":"4.5","4":"1.7","5":"virginica"},{"1":"7.3","2":"2.9","3":"6.3","4":"1.8","5":"virginica"},{"1":"6.7","2":"2.5","3":"5.8","4":"1.8","5":"virginica"},{"1":"7.2","2":"3.6","3":"6.1","4":"2.5","5":"virginica"},{"1":"6.5","2":"3.2","3":"5.1","4":"2.0","5":"virginica"},{"1":"6.4","2":"2.7","3":"5.3","4":"1.9","5":"virginica"},{"1":"6.8","2":"3.0","3":"5.5","4":"2.1","5":"virginica"},{"1":"5.7","2":"2.5","3":"5.0","4":"2.0","5":"virginica"},{"1":"5.8","2":"2.8","3":"5.1","4":"2.4","5":"virginica"},{"1":"6.4","2":"3.2","3":"5.3","4":"2.3","5":"virginica"},{"1":"6.5","2":"3.0","3":"5.5","4":"1.8","5":"virginica"},{"1":"7.7","2":"3.8","3":"6.7","4":"2.2","5":"virginica"},{"1":"7.7","2":"2.6","3":"6.9","4":"2.3","5":"virginica"},{"1":"6.0","2":"2.2","3":"5.0","4":"1.5","5":"virginica"},{"1":"6.9","2":"3.2","3":"5.7","4":"2.3","5":"virginica"},{"1":"5.6","2":"2.8","3":"4.9","4":"2.0","5":"virginica"},{"1":"7.7","2":"2.8","3":"6.7","4":"2.0","5":"virginica"},{"1":"6.3","2":"2.7","3":"4.9","4":"1.8","5":"virginica"},{"1":"6.7","2":"3.3","3":"5.7","4":"2.1","5":"virginica"},{"1":"7.2","2":"3.2","3":"6.0","4":"1.8","5":"virginica"},{"1":"6.2","2":"2.8","3":"4.8","4":"1.8","5":"virginica"},{"1":"6.1","2":"3.0","3":"4.9","4":"1.8","5":"virginica"},{"1":"6.4","2":"2.8","3":"5.6","4":"2.1","5":"virginica"},{"1":"7.2","2":"3.0","3":"5.8","4":"1.6","5":"virginica"},{"1":"7.4","2":"2.8","3":"6.1","4":"1.9","5":"virginica"},{"1":"7.9","2":"3.8","3":"6.4","4":"2.0","5":"virginica"},{"1":"6.4","2":"2.8","3":"5.6","4":"2.2","5":"virginica"},{"1":"6.3","2":"2.8","3":"5.1","4":"1.5","5":"virginica"},{"1":"6.1","2":"2.6","3":"5.6","4":"1.4","5":"virginica"},{"1":"7.7","2":"3.0","3":"6.1","4":"2.3","5":"virginica"},{"1":"6.3","2":"3.4","3":"5.6","4":"2.4","5":"virginica"},{"1":"6.4","2":"3.1","3":"5.5","4":"1.8","5":"virginica"},{"1":"6.0","2":"3.0","3":"4.8","4":"1.8","5":"virginica"},{"1":"6.9","2":"3.1","3":"5.4","4":"2.1","5":"virginica"},{"1":"6.7","2":"3.1","3":"5.6","4":"2.4","5":"virginica"},{"1":"6.9","2":"3.1","3":"5.1","4":"2.3","5":"virginica"},{"1":"5.8","2":"2.7","3":"5.1","4":"1.9","5":"virginica"},{"1":"6.8","2":"3.2","3":"5.9","4":"2.3","5":"virginica"},{"1":"6.7","2":"3.3","3":"5.7","4":"2.5","5":"virginica"},{"1":"6.7","2":"3.0","3":"5.2","4":"2.3","5":"virginica"},{"1":"6.3","2":"2.5","3":"5.0","4":"1.9","5":"virginica"},{"1":"6.5","2":"3.0","3":"5.2","4":"2.0","5":"virginica"},{"1":"6.2","2":"3.4","3":"5.4","4":"2.3","5":"virginica"},{"1":"5.9","2":"3.0","3":"5.1","4":"1.8","5":"virginica"}],"options":{"columns":{"min":{},"max":[10],"total":[5]},"rows":{"min":[10],"max":[10],"total":[150]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKVGhpcyBpcyBhbiBbUiBNYXJrZG93bl0oaHR0cDovL3JtYXJrZG93bi5yc3R1ZGlvLmNvbSkgTm90ZWJvb2suIFdoZW4geW91IGV4ZWN1dGUgY29kZSB3aXRoaW4gdGhlIG5vdGVib29rLCB0aGUgcmVzdWx0cyBhcHBlYXIgYmVuZWF0aCB0aGUgY29kZS4gCgpUcnkgZXhlY3V0aW5nIHRoaXMgY2h1bmsgYnkgY2xpY2tpbmcgdGhlICpSdW4qIGJ1dHRvbiB3aXRoaW4gdGhlIGNodW5rIG9yIGJ5IHBsYWNpbmcgeW91ciBjdXJzb3IgaW5zaWRlIGl0IGFuZCBwcmVzc2luZyAqQ21kK1NoaWZ0K0VudGVyKi4gCgpgYGB7cn0KcGxvdChjYXJzKQpgYGAKCkFkZCBhIG5ldyBjaHVuayBieSBjbGlja2luZyB0aGUgKkluc2VydCBDaHVuayogYnV0dG9uIG9uIHRoZSB0b29sYmFyIG9yIGJ5IHByZXNzaW5nICpDbWQrT3B0aW9uK0kqLgoKV2hlbiB5b3Ugc2F2ZSB0aGUgbm90ZWJvb2ssIGFuIEhUTUwgZmlsZSBjb250YWluaW5nIHRoZSBjb2RlIGFuZCBvdXRwdXQgd2lsbCBiZSBzYXZlZCBhbG9uZ3NpZGUgaXQgKGNsaWNrIHRoZSAqUHJldmlldyogYnV0dG9uIG9yIHByZXNzICpDbWQrU2hpZnQrSyogdG8gcHJldmlldyB0aGUgSFRNTCBmaWxlKS4gCgpUaGUgcHJldmlldyBzaG93cyB5b3UgYSByZW5kZXJlZCBIVE1MIGNvcHkgb2YgdGhlIGNvbnRlbnRzIG9mIHRoZSBlZGl0b3IuIENvbnNlcXVlbnRseSwgdW5saWtlICpLbml0KiwgKlByZXZpZXcqIGRvZXMgbm90IHJ1biBhbnkgUiBjb2RlIGNodW5rcy4gSW5zdGVhZCwgdGhlIG91dHB1dCBvZiB0aGUgY2h1bmsgd2hlbiBpdCB3YXMgbGFzdCBydW4gaW4gdGhlIGVkaXRvciBpcyBkaXNwbGF5ZWQuCgoKbGlicmFyeSh0aWR5dmVyc2UpCgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKVGhpcyBpcyBhbiBbUiBNYXJrZG93bl0oaHR0cDovL3JtYXJrZG93bi5yc3R1ZGlvLmNvbSkgTm90ZWJvb2suIFdoZW4geW91IGV4ZWN1dGUgY29kZSB3aXRoaW4gdGhlIG5vdGVib29rLCB0aGUgcmVzdWx0cyBhcHBlYXIgYmVuZWF0aCB0aGUgY29kZS4gCgpUcnkgZXhlY3V0aW5nIHRoaXMgY2h1bmsgYnkgY2xpY2tpbmcgdGhlICpSdW4qIGJ1dHRvbiB3aXRoaW4gdGhlIGNodW5rIG9yIGJ5IHBsYWNpbmcgeW91ciBjdXJzb3IgaW5zaWRlIGl0IGFuZCBwcmVzc2luZyAqQ21kK1NoaWZ0K0VudGVyKi4gCgpgYGB7cn0KcGxvdChjYXJzKQpgYGAKCkFkZCBhIG5ldyBjaHVuayBieSBjbGlja2luZyB0aGUgKkluc2VydCBDaHVuayogYnV0dG9uIG9uIHRoZSB0b29sYmFyIG9yIGJ5IHByZXNzaW5nICpDbWQrT3B0aW9uK0kqLgoKV2hlbiB5b3Ugc2F2ZSB0aGUgbm90ZWJvb2ssIGFuIEhUTUwgZmlsZSBjb250YWluaW5nIHRoZSBjb2RlIGFuZCBvdXRwdXQgd2lsbCBiZSBzYXZlZCBhbG9uZ3NpZGUgaXQgKGNsaWNrIHRoZSAqUHJldmlldyogYnV0dG9uIG9yIHByZXNzICpDbWQrU2hpZnQrSyogdG8gcHJldmlldyB0aGUgSFRNTCBmaWxlKS4gCgpUaGUgcHJldmlldyBzaG93cyB5b3UgYSByZW5kZXJlZCBIVE1MIGNvcHkgb2YgdGhlIGNvbnRlbnRzIG9mIHRoZSBlZGl0b3IuIENvbnNlcXVlbnRseSwgdW5saWtlICpLbml0KiwgKlByZXZpZXcqIGRvZXMgbm90IHJ1biBhbnkgUiBjb2RlIGNodW5rcy4gSW5zdGVhZCwgdGhlIG91dHB1dCBvZiB0aGUgY2h1bmsgd2hlbiBpdCB3YXMgbGFzdCBydW4gaW4gdGhlIGVkaXRvciBpcyBkaXNwbGF5ZWQuCgoKYGBge3J9CmxpYnJhcnkodGlkeXZlcnNlKQoxICsgNAoKZHB1dChtdGNhcnMpCgpgYGAKCmBgYHtyfQoKCmBgYAoKPCEtLQoKMTZ0aCBKYW4gMjAyNToKCnBpcGUgb3BlcmF0b3I6Cnw+CiU+JSAKYm90aCBhcmUgc2FtZQptdXRhdGUgbWVhbnMgYWRkaW5nIGEgY29sdW1uIGdpdmUgdGhlIHF1YWRyYXRpYyBlcXVhdGlvbiBmb3JtdWxhIGluIG11dGF0ZQp0cnV0aCBkYXRhIGkgb2J0YWluZWQKTWFjaGluZSBsZWFybmluZyB0YXNrOgp0cnkgYW5kIHJlY292ZXIgdGhlIGZ1bmN0aW9uIHJlbGF0aW5nIHRvIHggaW5wdXQgYW5kIHRoZSB5IG91dHB1dAoKbGluZWFyIG1vZGVsIGZ1bmN0aW9uICBsbSgpCmRwbHlyOjpzZWxlY3QoeCwgeSkgIHVzZSB0aGUgc2VsZWN0IGZ1bmN0aW9uIHdpdGhvdXQgaW1wb3J0aW5nIHRoZSBlbnRpcmUgcGFja2FnZQpwcmVmYWNlIC0+IHdvcmtmbG93IGJhc2ljcwpyZWFkIGNoYXB0ZXIgdGhlbiBnbyB0aHJvdWdoIGxlY3R1cmUgc2xpZGVzCi0tPgpgYGB7cn0KbW9kMSA8LSBsbShmb3JtdWxhID0geSB+IHgsZGF0YSA9IG15X3RyYWluKQpgYGAKCjwhLS0KeSBpcyB0aGUgb3V0cHV0IGFuZCB4IGlzIHRoZSBpbnB1dCBmdW5jdGlvbgpkYXRhIGlzIHRoZSBkYXRhZnJhbWUKPSBzaWduIGZvciBpbnNpZGUgYXJndW1lbnRzCjwtIHZhcmlhYmxlIGFzc2lnbmluZwoKZGYgPC0gdGliYmxlKCkKcm0oZGYpCi0tPgoKYGBge3J9CnN1bW1hcnkobW9kZWwpCmBgYAoKPCEtLQpzdGF0aXN0aWNhbGx5IHNpZ25pZmljYW5jZQotIGlmIDk1JSBjb25maWRlbmNlIGluY2x1ZGVzIDAgdGhlbiB0aGVyZSBpcyBubyByZWxhdGlvbiBiZXR3ZWVuIHRoZSBpbnB1dCBhbmQgb3V0cHV0Ci0gbG9va2luZyBmb3IgOTUlIGNvbmZpZGVuY2Ugd2hpY2ggZG9lc24ndCBpbmNsdWRlIDAgdGhlbiB3ZSBnZXQgdGhlIGV2aWRlbmNlIHRvIHJlamVjdCB0aGUgaHlwb3RoZXNpcwoKCmNvZWZwbG90Ojpjb2VmcGxvdChtb2QxKSArIGxhYmxlbHMgKyB0aGVtZQoKCnVzZXMgZ2dwbG90IGNvZGUgYmVjYXVzZSB3ZSBjYW4gYWRkIHRoZSBjb21wb25lbnRzCgp1c2UgZnVuY3Rpb24gcG9seSgpIHRoYXQgY29udmVydHMgd2hhdCBkZWdyZWUgcG9seW5vbWlhbCAKCm1vZDEgPC0gbG0oZm9ybXVsYSA9IHkgfiB4ICsgSSh4XjIpLGRhdGEgPSBteV90cmFpbikKCndoaWNoIG1vZGVsIGlzIGJldHRlcj8KcGVyZm9ybWFuY2UgbWV0cmljIHVzZWQgdG8gY29tcGFyZSB0aGVzZSBtb2RlbHMKb25lIGltcG9ydGFudCBtZXRyaWMgLSBzdW0gb2Ygc3F1YXJlZCBlcnJvcnMgKGhvdyBmYXIgYXdheSB0aGUgZXJyb3IgZnJvbSBlc3RpbWF0ZWQgdmFsdWVzKQp3ZSBzaG91bGQgbWluaW1pemUgdGhlIHN1bSBvZiBzcXVhcmVkIGVycm9ycwoKbW9kMSBpcyB0aGUgdHJhaW5lZCBvYmplY3QKbW9kMSBpcyB0cmFpbmVkIG9uIG15X3RyYWluCnJtc2UoKQptb2RlbHI6OnJtc2UobW9kMSwgbXlfdHJhaW4pCgpUaGUgOHRoIGRlZ3JlZSBwb2x5bm9taWFsIGhhcyB0aGUgbG93ZXN0IFJNU0UhIQpmYWNldCAKbW9yZSBkZWdyZWVzIG9mIHBvbHlub21pYWwgZ2l2ZW4gdGhlbiBhbHdheXMgd2UgZGVjcmVhc2UgdGhlIHRyYWluaW5nIGVycm9yCgpSLXNxdWFyZWQgaXMgdGhlIHNxdWFyZWQgY29ycmVsYXRpb24gY29lZmZpY2llbnQgYmV0d2VlbiB0aGUgbW9kZWwgYW5kIHRoZSBjb2VmZmljaWVudHMKbW9kZWxyOjpyc3F1YXJlKG1vZDIsIG15X3RyYWluKQoKaXQgcmFuZ2VzIGZyb20gMCB0byAxCmJlc3Qgci1zcXVhcmUgc2hvdWxkIGJlIDEgdGhhdCBpcyBjbG9zZXIgdG8gMQoKdGliYmxlKHggPSBzZXEoLTIuMSwgMi4xLCBsZW5ndGgub3V0ID0gNTEpKQp4IGlzIHRoZSBuZXcgY29sdW1uCgpnZW5lcmF0aW5nIGV2ZW5seSBzcGFjZWQgdGVzdCBwb2ludHMKCnRvIHByZWRpY3QgdGhlIG1vZGVsCnByZWRpY3QoKSBmdW5jdGlvbgpmaXJzdCBvYmplY3QgLSBtb2RlbCwgc2Vjb25kIHBhcmFtZXRlciAtIHRlc3Qgc2V0CgpwcmVkaWN0IGlzIHByZWRpY3RpbmcgYmFzZWQgb24gdGhlIGNvbHVtbnMKCnNjYWxlcwoKYmlhcyB2YXJpYW5jZSB0cmFkZS1vZmYKCmRhdGEgc3BsaXR0aW5nIHRvIGFwcHJveGltYXRlICJuZXciIGRhdGEKCmNyZWF0ZSB0aGUgZGF0YSBzcGxpdAoKd2UgbWlnaHQgYmVjb21lIHVubHVja3kgYmVjYXVzZSBvZiBzb21lIG1pbmltYWwgb3V0bGllciBwb2ludCB3aGljaCBtYWtlcyB0aGUgZXJyb3IgZG93biBzbyB0aGF0IGlzIHdoeSB3ZSB0cmFpbiB0aGUgbW9kZWwgbXVsdGlwbGUgdGltZXMgd2l0aCBzb21lIGNoYW5nZXMsIDd0aCBkZWdyZWUgcG9seW5vbWlhbCBzZWVtcyBiZXN0IHRoYW4gOHRoIGRlZ3JlZSBwb2x5bm9taWFsIGFtb25nIHRoZSBtb2RlbHMgZHVlIHRvIHRoYXQgdW5sdWNreSBvdXRsaWVyIHdoaWNoIHJlZHVjZWQgdGhlIGVycm9yLgpyZXNhbXBsaW5nOgpjb21tb24gYXBwcm9hY2hlcyBvZiByZXNhbXBsaW5nOgoxLiBCb290c3RyYXAgLSByZXNhbXBsaW5nIHdpdGggcmVwbGFjZW1lbnQKMi4gSy1mb2xkIGNyb3NzIHZhbGlkYXRpb24gLSBlbnN1cmUgZWFjaCBvYnNlcnZhdGlvbiBpcyB1c2VkIGFzIGEgdGVzdCBwb2ludCBvbmNlCgpob3cgbWFueSBmb2xkcz8gYXMgbWFueSBhcyB0aGUgY29tcHV0ZSBoYW5kbGVzCgpvdmVyZml0IHVuZGVyZml0CndlIG5lZWQgdG8gZmluZCB0aGUgYmFsYW5jZSBiZXR3ZWVuIHRoaXMgb3ZlcmZpdCBhbmQgdW5kZXJmaXQuCnNtYWxsZXIgbW9kZWxzIGRvIG5vdCBoYXZlIGZlbHhpYmlsaXR5IHRvIGFkYXB0IHdpdGggdGVoIG91dGxpZXJzLgoKb25lLXN0YW5kYXJkIGVycm9yIHJ1bGUKc2luY2UgdGhlIG1vZGVscyBhcmUgdGhlcmUgaW4gMSBzdGFuZGFyZCBkZXZpYXRpb24gdGhlbiB3ZSBjYW4gdGFrZSBzaW1wbGVyIG1vZGVsCgpjYXJldCBwYWNrYWdlIHRvIGhhbmRsZSBhc3NpZ25tZW50CgoKLS0+CgpgYGB7cn0Kc3RyKGlyaXMpCgppcmlzW2lyaXMkU2VwYWwuTGVuZ3RoID4gNS44LCBdCgppcmlzW2lyaXMkU3BlY2llcyA9PSAic2V0b3NhIiwgXQoKaXJpcyAlPiUgbmFtZXMoKQppcmlzIHw+IHN0cigpCmlyaXMgJT4lIG5hbWVzKCkgJT4lIGxlbmd0aCgpCmRmIDwtIGRhdGEuZnJhbWUoaXJpcykKZGYKYGBgCgoKCgoK</div>
 
 
 

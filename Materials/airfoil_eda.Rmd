@@ -1,0 +1,572 @@
+---
+title: "Applied machine learning: Airfoil Noise Demo"
+subtitle: "Explorator Data Analysis (EDA)"
+author: "Dr. Joseph P. Yurko"
+date: "Fall 2021 Semester"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+This RMarkdown does not provide detailed explanations, as I usually give in reports. The purpose is to demonstrate the major steps of an Exploratory Data Analysis (EDA) on a realistic data set. The data are associated with a series of experiments related to airfoil noise. The data and some basic information about the variables can be found on the [UCI Machine Learning Repository site](https://archive.ics.uci.edu/ml/datasets/airfoil+self-noise). The code within this report corresponds to my initial attempt exploring the data to give you a realistic set of steps used to explore data.  
+
+This report mostly uses the `tidyverse`. You will also need the `visdat`, `GGally`, `corrplot`, and `corrr` packages installed to run all code chunks yourself. The `tidyverse` is loaded in the code chunk below.  
+
+```{r, load_tidyverse_pkg}
+library(tidyverse)
+```
+
+## Read data
+
+Read in the data from the source.  
+
+```{r, read_from_source}
+data_url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/00291/airfoil_self_noise.dat"
+
+### the file has no headers and has the variables separated by tabs
+df <- readr::read_tsv(data_url, col_names = FALSE)
+```
+
+
+Provide names for each variable.  
+
+```{r, make_df_col_naems}
+names(df) <- c("frequency", "aoa", "chord", "velocity", "displacement", "decibels")
+
+df %>% glimpse()
+```
+
+## Basic information
+
+Visually check for missing values using the `visdat` package.  
+
+```{r, check_viz_miss}
+visdat::vis_miss(df)
+```
+
+Check the data types visually.  
+
+```{r, check_viz_dtypes}
+visdat::vis_dat(df)
+```
+
+Check the number of unique values per variable.  
+
+```{r, check_unique_per_variable}
+df %>% purrr::map_dbl(n_distinct)
+```
+
+Two of the variables have relatively few unique values! Check the counts associated with each unique value for `chord`.  
+
+```{r, check_chord_counts}
+df %>% count(chord)
+```
+
+Check the counts associated with each unique value for `velocity`.  
+
+```{r, check_velocity_counts}
+df %>% count(velocity)
+```
+
+Check the combinations of the two.  
+
+```{r, check_chord_vel_combo}
+df %>% count(chord, velocity)
+```
+
+However, I prefer to graphically display counts with bar charts. The `chord` bar chart is below.  
+
+```{r, viz_chord_barchart}
+df %>% 
+  ggplot(mapping = aes(x = as.factor(chord))) +
+  geom_bar() +
+  theme_bw()
+```
+
+The `velocity` bar chart is below.  
+
+```{r, viz_velocity_barchart}
+df %>% 
+  ggplot(mapping = aes(x = as.factor(velocity))) +
+  geom_bar() +
+  theme_bw()
+```
+
+Visualize the combinations with a "dodged" bar chart.  
+
+```{r, viz_chord_vel_barcombo}
+df %>% 
+  ggplot(mapping = aes(x = as.factor(chord))) +
+  geom_bar(mapping = aes(fill = as.factor(velocity)),
+           position = "dodge") +
+  scale_fill_viridis_d("Velocity") +
+  theme_bw()
+```
+
+Visualize the combinations as a heatmap.  
+
+```{r, viz_chord_vel_heatmap}
+df %>% 
+  count(chord, velocity) %>% 
+  ggplot(mapping = aes(x = as.factor(chord), y = as.factor(velocity))) +
+  geom_tile(mapping = aes(fill = n), color = 'black') +
+  geom_text(mapping = aes(label = n,
+                          color = n > median(n)),
+            size = 7) +
+  scale_fill_viridis_c(guide = 'none', option = 'magma') +
+  scale_color_manual(guide = 'none',
+                     values = c("TRUE" = 'black',
+                                "FALSE" = 'white')) +
+  theme_bw()
+```
+
+It is important to note that even though these variables have relatively few unique values, they are **not** categorical. They are continuous and should be treated that way in models. These two have relatively few unique values due to the experimental design choice. I will refer to them as "discrete-like" or "categorical-like" to distinguish them from the other inputs which have far more unique values.  
+
+Check the number of unique combinations of all inputs.  
+
+```{r, check_distinct_rows}
+df %>% 
+  select(-decibels) %>% 
+  distinct() %>% 
+  dim()
+```
+
+The data set has `r nrow(df)` rows. As shown in the output display above, there are 1503 unique combinations of the 5 inputs. That means we have zero **replications** of any combination of all 5 inputs. From an experimental design perspective this is unfortunate! I would have preferred replications to allow examining the natural variability of the process.  
+
+## Input distributions
+
+Examine the inputs with a large number of unique values.  
+
+```{r, viz_input_hist}
+input_names <- c("frequency", "aoa", "chord", "velocity", "displacement")
+
+df %>% 
+  select(all_of(input_names)) %>% 
+  select(-chord, -velocity) %>% 
+  tibble::rowid_to_column() %>% 
+  pivot_longer(!c("rowid")) %>% 
+  ggplot(mapping = aes(x = value)) +
+  geom_histogram(bins = 35) +
+  facet_wrap(~name, scales = "free") +
+  theme_bw() +
+  theme(axis.text.y = element_blank())
+```
+
+Looks like angle-of-attack, `aoa`, is zero inflated. Confirm if the "spike" near zero corresponds to values at identically equal to zero.  
+
+```{r, check_aoa_num_zero}
+df %>% 
+  summarise(count_aoa_equal_zero = sum(aoa == 0),
+            fraction_aoa_equal_zero = mean(aoa == 0))
+```
+
+The `frequency` variable looks highly right skewed.  
+
+```{r, check_freq_bounds}
+df %>% select(frequency) %>% summary()
+```
+
+Apply the log10 transformation to `frequency`. We saw previouisly that `frequency` has 21 unique values. The histogram below uses 35 bins which results in "gaps" appearing between the bins. This highlights what appears to be a grid like structure within the log10 space of `frequency`.  
+
+```{r, viz_log10_freq_hist}
+df %>% 
+  ggplot(mapping = aes(x = log10(frequency))) +
+  geom_histogram(bins = 35) +
+  theme_bw()
+```
+
+Confirm the grid-like structure by including the rug "tick" marks and using just 21 bins.  
+
+```{r, viz_log10_freq_hist_b}
+df %>% 
+  ggplot(mapping = aes(x = log10(frequency))) +
+  geom_rug(color = 'red', size = 2) +
+  geom_histogram(bins = 21) +
+  theme_bw()
+```
+
+The `displacement` variable also looks highly right skewed. Check the bounds and summary stats on the `displacement` variable.  
+
+```{r, check_displ_stats}
+df %>% select(displacement) %>% summary()
+```
+
+Apply the natural log transformation to `displacement`. The histogram of the transformed variable with the rug marks is shown below. We know from before that `displacement` has over 100 unique values.  
+
+```{r, viz_logdisp_hist}
+df %>% 
+  ggplot(mapping = aes(x = log(displacement))) +
+  geom_rug(color = 'red', size = 1, alpha = 0.2) +
+  geom_histogram(bins = 35) +
+  theme_bw()
+```
+
+Apply the transformations above and remove the original variables for simplicity.  
+
+```{r, change_df}
+df_b <- df %>% 
+  mutate(log_d = log(displacement),
+         log_f = log10(frequency)) %>% 
+  select(-displacement, -frequency)
+```
+
+
+Look at the distribution of the more continuous like inputs for each combination of the "discrete-like" inputs. We saw previously in the heatmap that some combinations of `chord` and `velocity` have as few as 30 observations. Because of that, use a kernel density estimate with a bandwidth encouraged to smooth the distribution more than the default settings. Visualize the transformed `displacement` and `frequency` variables instead of the original variables.  
+
+```{r, viz_input_hist_by_group}
+df_b %>% 
+  tibble::rowid_to_column() %>% 
+  pivot_longer(cols = c("aoa", "log_d", "log_f")) %>% 
+  ggplot(mapping = aes(x = value)) +
+  geom_rug(color = 'red') +
+  geom_density(mapping = aes(group = interaction(name, chord, velocity),
+                             color = as.factor(chord)),
+               size = 1.2, adjust = 1.35) +
+  facet_grid(velocity ~ name, labeller = "label_both", scales = "free") +
+  scale_color_viridis_d("chord", option = 'inferno') +
+  theme_bw() +
+  theme(panel.background = element_rect(fill = 'grey70'),
+        panel.grid.minor = element_blank())
+```
+
+Focus on the distribution of angle-of-attack, `aoa`, since it was difficult to see in the figure above.  
+
+```{r, viz_input_aoa_by_group}
+df_b %>% 
+  tibble::rowid_to_column() %>% 
+  pivot_longer(cols = c("aoa", "log_d", "log_f")) %>% 
+  filter(name == 'aoa') %>% 
+  ggplot(mapping = aes(x = value)) +
+  geom_rug(color = 'red') +
+  geom_density(mapping = aes(group = interaction(name, chord, velocity),
+                             color = as.factor(chord)),
+               size = 1.2, adjust = 1.35) +
+  facet_grid(velocity ~ name, labeller = "label_both", scales = "free") +
+  scale_color_viridis_d("chord", option = 'inferno') +
+  theme_bw() +
+  theme(panel.background = element_rect(fill = 'grey70'),
+        panel.grid.minor = element_blank())
+```
+
+Examine the summary statistics associated with the continuous-like inputs for each "discrete-like" combination. The summary statistics are visualized with boxplots below. The angle-of-attack `aoa` is decreasing as `chord` increases~ The `log_d` becomes more concentrated near its center as `chord` increases.  
+
+```{r, viz_input_box_by_group}
+df_b %>% 
+  tibble::rowid_to_column() %>% 
+  pivot_longer(cols = c("aoa", "log_d", "log_f")) %>% 
+  ggplot(mapping = aes(x = as.factor(chord), y = value)) +
+  geom_boxplot(mapping = aes(fill = as.factor(velocity),
+                             color = as.factor(velocity)),
+               alpha = 0.35) +
+  facet_grid(name ~ ., scales = "free_y") +
+  scale_fill_viridis_d("Velocity") +
+  scale_color_viridis_d("Velocity") +
+  theme_bw()
+```
+
+Pairs plot between all inputs.  
+
+```{r, viz_pairs_inputs_all}
+df_b %>% 
+  select(-decibels) %>% 
+  GGally::ggpairs(progress = FALSE,
+                  diag = list(continuous = GGally::wrap('barDiag', bins=25))) +
+  theme_bw()
+```
+
+The pairs plot allows us to see which input pairs have a "grid-like" structure in this application. For example, the `chord` and `velocity` variables have a clear "grid-like" pattern. We already looked at that pattern with the heatmap previously. We can look at those same counts with a "count scatter plot", as shown below.  
+
+```{r, viz_chord_vel_count_scatter}
+df_b %>% 
+  ggplot(mapping = aes(x = chord, y = velocity)) +
+  geom_count() +
+  scale_size_continuous(range = c(1, 10)) +
+  theme_bw()
+```
+
+The `chord` and `aoa` also have a clear structure where the `aoa` range depends on the value of `chord`.  
+
+```{r, viz_chord_aoa_scatter}
+df_b %>% 
+  ggplot(mapping = aes(x = aoa, y = chord)) +
+  geom_point(size = 4.5) +
+  theme_bw()
+```
+
+The count plot below helps us see which combinations have high vs low counts.  
+
+```{r, viz_chord_aoa_scatter_count}
+df_b %>% 
+  ggplot(mapping = aes(x = aoa, y = chord)) +
+  geom_count() +
+  scale_size_continuous(range = c(1, 10)) +
+  theme_bw()
+```
+
+Break up by `velocity`.  
+
+```{r, viz_chord_aoa_scatter_count_b}
+df_b %>% 
+  ggplot(mapping = aes(x = aoa, y = chord)) +
+  geom_count() +
+  facet_wrap(~velocity, labeller = "label_both") +
+  theme_bw()
+```
+
+Next, let's focus on the scatter plot between `log_f` and `log_d`.  
+
+```{r, viz_logf_logd_scatter}
+df_b %>% 
+  ggplot(mapping = aes(x = log_f, y = log_d)) +
+  geom_point() +
+  theme_bw()
+```
+
+Check the counts for each combination.  
+
+```{r, viz_logf_logd_scatter_count}
+df_b %>% 
+  ggplot(mapping = aes(x = log_f, y = log_d)) +
+  geom_count() +
+  theme_bw()
+```
+
+Looks like there are either 1 or 2 observations per combination. Check below.  
+
+```{r, viz_logf_logd_scatter_counb}
+df_b %>% 
+  count(log_f, log_d) %>% 
+  ggplot(mapping = aes(x = log_f, y = log_d)) +
+  geom_point(mapping = aes(color = as.factor(n),
+                           size = n)) +
+  scale_color_brewer("n", palette = "Set1") +
+  scale_size_continuous(guide = 'none') +
+  theme_bw()
+```
+
+Breakup by the `chord` and `velocity` combinations and color by `aoa`. The graphic below is visualizing all 5 inputs variables together in a single chart!  
+
+```{r, viz_all_inputs_together}
+df_b %>% 
+  ggplot(mapping = aes(x = log_f, y = log_d)) +
+  geom_point(mapping = aes(color = aoa)) +
+  facet_grid(velocity ~ chord, labeller = "label_both") +
+  scale_color_viridis_c() +
+  theme_bw()
+```
+
+The pairs plot had revealed the rather high correlation between `aoa` and `log_d`. Let's check below.  
+
+```{r, viz_pairs_inputs_continuous}
+df_b %>% 
+  select(aoa, log_d, log_f) %>% 
+  GGally::ggpairs(progress = FALSE,
+                  diag = list(continuous = GGally::wrap('barDiag', bins=25))) +
+  theme_bw()
+```
+
+If we just want to focus on the correlation coefficient between variables we can use a correlation plot.  
+
+```{r, viz_input_corrplot}
+df_b %>% 
+  select(-decibels) %>% 
+  cor() %>% 
+  corrplot::corrplot(method = 'number', type = 'upper')
+```
+
+Let's focus on the relationship between `aoa` and `log_d`.  
+
+```{r, viz_aoa_logd_scatter}
+df_b %>% 
+  ggplot(mapping = aes(x = aoa, y = log_d)) +
+  geom_point(size = 4.5) +
+  theme_bw()
+```
+
+Break up by the `chord` and `velocity` combinations. The relationship between the two is now very clear! The log transformed `displacement` appears nearly linearly related to the angle-of-attack.
+
+```{r, viz_aoa_logd_combos_scatter}
+df_b %>% 
+  ggplot(mapping = aes(x = aoa, y = log_d)) +
+  geom_point(size = 2) +
+  facet_grid(velocity ~ chord, labeller = "label_both") +
+  theme_bw()
+```
+
+Let's check the counts.  
+
+```{r, viz_aoa_logd_combos_scatter_count}
+df_b %>% 
+  ggplot(mapping = aes(x = aoa, y = log_d)) +
+  geom_count() +
+  facet_grid(velocity ~ chord, labeller = "label_both") +
+  theme_bw()
+```
+
+Let's check the relationship between the original `displacement` variable and the angle-of-attack. As shown below, we still have a relationship between the variables. That relationship just appears exponential like in the original `displacement` space.  
+
+```{r, viz_aoa_displ_scatter}
+df %>% 
+  ggplot(mapping = aes(x = aoa, y = displacement)) +
+  geom_point(size = 2) +
+  facet_grid(velocity ~ chord, labeller = "label_both") +
+  theme_bw()
+```
+
+We saw previously that there are no replications of the 5 inputs in the data set. Since the `aoa` and log-transformed `displacement` appear so highly related to each other let's check if there are replications when we remove `log_d` from the variable set. As shown below there are no replications when we consider just four out of the five inputs!  
+
+```{r, check_reps_wl_log_d}
+df_b %>% 
+  select(chord, velocity, log_f, aoa) %>% 
+  distinct() %>% 
+  nrow()
+```
+
+This is representative of the high correlation between `aoa` and `log_d`. Let's do one final check by calculating the correlation coefficient between the "continuous-like" inputs for each `velocity` and `chord` combination. The correlation coefficient between `aoa` and `log_d` for each `chord` and `velocity` group can be essentially 1!  
+
+```{r, viz_corr_by_grouping}
+df_b %>% 
+  select(-decibels) %>% 
+  group_by(chord, velocity) %>% 
+  tidyr::nest() %>% 
+  mutate(cor_wf = map(data, corrr::correlate, quiet = TRUE, diagonal = 1),
+         cor_lf = map(cor_wf, corrr::stretch)) %>% 
+  select(chord, velocity, cor_lf) %>% 
+  tidyr::unnest(cor_lf) %>% 
+  ungroup() %>% 
+  ggplot(mapping = aes(x = x, y = y)) +
+  geom_tile(mapping = aes(fill = r),
+            color = 'white') +
+  geom_text(mapping = aes(label = round(r, 2),
+                          color = abs(r) > 0.75),
+            size = 2.5) +
+  facet_grid(velocity ~ chord, labeller = "label_both") +
+  scale_fill_gradient2('corr',
+                       low = 'red', mid = 'white', high = 'blue',
+                       midpoint = 0,
+                       limits = c(-1, 1)) +
+  scale_color_manual(guide = 'none',
+                     values = c("TRUE" = 'white',
+                                "FALSE" = 'black')) +
+  labs(x='', y='') +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle=90, vjust=0.5, size=4.5),
+        axis.text.y = element_text(size = 5.5))
+```
+
+## Output visualizations
+
+The previous figures focused on the inputs. Let's now consider the output (response) and the relationships between the output and the inputs.  
+
+Histogram of the response with quartiles and rug marks included for reference.  
+
+```{r, viz_output_hist}
+df_b %>% 
+  ggplot(mapping = aes(x = decibels)) +
+  geom_rug(alpha = 0.2) +
+  geom_histogram(bins = 41) +
+  geom_vline(xintercept = quantile(df_b$decibels),
+             color = 'red', size = 1.2, linetype = 'dashed') +
+  theme_bw()
+```
+
+Visualize the output distribution for each `chord` and `velocity` combination. Use a kernel density estimate since the number of observations for some of the groups is relatively low.  
+
+```{r, viz_output_hist_group}
+df_b %>% 
+  ggplot(mapping = aes(x = decibels)) +
+  geom_density(mapping = aes(color = as.factor(velocity)),
+               size = 1.1,
+               adjust = 1.35) +
+  facet_wrap(~chord, labeller = "label_both") +
+  scale_color_viridis_d("Velocity") +
+  theme_bw()
+```
+
+Visualize the key summary statistics per `chord` and `velocity` combination with boxplots.  
+
+```{r, viz_output_box_groups}
+df_b %>% 
+  ggplot(mapping = aes(x = as.factor(chord), y = decibels)) +
+  geom_boxplot(mapping = aes(group = interaction(chord, velocity),
+                             fill = as.factor(velocity),
+                             color = as.factor(velocity)),
+               alpha = 0.35) +
+  scale_fill_viridis_d("Velocity") +
+  scale_color_viridis_d("Velocity") +
+  theme_bw()
+```
+
+Include the mean per group and the $\pm$ 2 standard error interval on the mean.  
+
+```{r, viz_output_box_groups_w_mean}
+df_b %>% 
+  ggplot(mapping = aes(x = as.factor(chord), y = decibels)) +
+  geom_boxplot(mapping = aes(group = interaction(chord, velocity),
+                             fill = as.factor(velocity),
+                             color = as.factor(velocity)),
+               alpha = 0.2) +
+  stat_summary(fun.data = "mean_se",
+               mapping = aes(group = interaction(chord, velocity),
+                             color = as.factor(velocity)),
+               fun.args = list(mult = 2),
+               position = position_dodge(0.75)) +
+  scale_fill_viridis_d("Velocity") +
+  scale_color_viridis_d("Velocity") +
+  theme_bw()
+```
+
+Look at the scatter plot between `aoa` and `log_f` where the marker color corresponds to the response value. Use separate facets for each `chord` and `velocity` combination.  
+
+```{r, viz_output_surf_per_group}
+df_b %>% 
+  ggplot(mapping = aes(x = aoa, y = log_f)) +
+  geom_point(size = 3.5,
+             mapping = aes(color = decibels)) +
+  facet_grid(velocity ~ chord, labeller = "label_both") +
+  scale_color_viridis_c() +
+  theme_bw()
+```
+
+Summarize the response value in case of overlap in the previous figure. Let the x-axis scales vary by facet column. Figure is tough to look at!  
+
+```{r, viz_output_surf_per_group_mean}
+df_b %>% 
+  ggplot(mapping = aes(x = aoa, y = log_f)) +
+  stat_summary_2d(fun = 'mean',
+                  mapping = aes(z = decibels)) +
+  facet_grid(velocity ~ chord, labeller = "label_both", scales = "free_x") +
+  scale_fill_viridis_c() +
+  theme_bw()
+```
+
+Instead, plot the response with respect to `log_f` for each `chord` and `velocity` combination colored by `aoa`. There seems to be non-linear trends between the response and `log_f`! Those trends appear to be depend on the angle-of-attack, and the `chord`!  
+
+```{r, viz_response_logf_scatter_group}
+df_b %>% 
+  ggplot(mapping = aes(x = log_f, y = decibels)) +
+  geom_point(mapping = aes(color = aoa)) +
+  facet_grid(velocity ~ chord, labeller = "label_both") +
+  scale_color_viridis_c(option = 'plasma') +
+  theme_bw()
+```
+
+Include a non-linear smoother to help make it easier to see the trends.  
+
+```{r, viz_response_logf_smooth_group}
+df_b %>% 
+  ggplot(mapping = aes(x = log_f, y = decibels)) +
+  geom_point(mapping = aes(color = aoa), alpha = 0.5) +
+  geom_smooth(formula = y ~ x,
+              mapping = aes(group = interaction(chord, velocity, aoa),
+                            color = aoa), 
+              size = 1.) +
+  facet_grid(velocity ~ chord, labeller = "label_both") +
+  scale_color_viridis_c(option = 'plasma') +
+  theme_bw()
+```
+

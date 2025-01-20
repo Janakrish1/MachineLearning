@@ -1,0 +1,825 @@
+---
+title: "Applied machine learning: Airfoil Noise Demo"
+subtitle: "Linear Models"
+author: "Dr. Joseph P. Yurko"
+date: "Fall 2021 Semester"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+This Rmarkdown does not provide the detailed explanations I usually give in reports. It's purpose is to demonstrate fitting and evaluating linear models in a realistic data analysis application. The data are associated with a series of experiments related to airfoil noise. The data and some basic information about the variables can be found on the [UCI Machine Learning Repository site](https://archive.ics.uci.edu/ml/datasets/airfoil+self-noise). The code within this report corresponds to my initial attempt at modeling the response as a function of the inputs. The modeling choices were based on the conclusions drawn from the EDA (which is provided in a separate report).  
+
+We will mostly use the `tidyverse` suite of packages in this report. You must also have the `coefplot`, `broom`, `yardstick`, `rsample` packages downloaded and installed to run the code chunks yourself. Several of these packages are included in the `tidymodels` suite of packages. Check your list of packages to see if you have them already installed.  
+
+```{r, load_tidyverse_pkg}
+library(tidyverse)
+```
+
+## Read and prepare data
+
+```{r, read_data_from_source}
+data_url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/00291/airfoil_self_noise.dat"
+
+### the file has no headers and has the variables separated by tabs
+df <- readr::read_tsv(data_url, col_names = FALSE)
+```
+
+Change the variable names.  
+
+```{r, change_var_names}
+names(df) <- c("frequency", "aoa", "chord", "velocity", "displacement", "decibels")
+
+df %>% glimpse()
+```
+
+Transform several of the variables based on the EDA.  
+
+```{r, make_df_changes}
+df_b <- df %>% 
+  mutate(log_d = log(displacement),
+         log_f = log10(frequency)) %>% 
+  select(-displacement, -frequency) %>% 
+  select(log_f, aoa, chord, velocity, log_d, decibels)
+```
+
+The inputs cover different scales with different levels of variation, as shown by the boxplots below.  
+
+```{r, viz_input_box_raw}
+df_b %>% 
+  tibble::rowid_to_column() %>% 
+  pivot_longer(!c("rowid", "decibels")) %>% 
+  ggplot(mapping = aes(x = name, y = value)) +
+  geom_boxplot(fill = 'grey', alpha = 0.5) +
+  theme_bw()
+```
+
+Instead of working with the raw or original inputs, we will work with **standardized** inputs. The data set created below standardizes the inputs. The response, `decibels`, is also standardized.  
+
+```{r, make_ready_df}
+ready_df <- df_b %>% 
+  scale(center = TRUE, scale = TRUE) %>% 
+  as.data.frame() %>% tibble::as_tibble() %>% 
+  purrr::set_names(names(df_b))
+```
+
+
+The boxplots shown below confirm that all variables are now of similar ranges. The means are included as red dots to confirm the average in the standardized space is zero.  
+
+```{r, viz_input_box_std}
+ready_df %>% 
+  tibble::rowid_to_column() %>% 
+  pivot_longer(-rowid, names_to = "variable_name", values_to = "value") %>% 
+  ggplot(mapping = aes(x = variable_name, y = value)) +
+  geom_boxplot(fill = 'grey50', alpha = 0.5) +
+  stat_summary(fun.data = 'mean_se',
+               fun.args = list(mult = 2),
+               color = 'red') +
+  theme_bw()
+```
+
+## Models
+
+Because of the high correlation observed between `aoa` and `log_d` we will mostly focus on 4 out of 5 inputs: `aoa`, `chord`, `log_f`, and `velocity`.  
+
+We will fit models using the base `R` `lm()` function and the formula interface. We will work with the formula interface throughout the semester, so you will get plenty of practice working with it.  
+
+### Linear additive terms
+
+```{r, fit_mod_01}
+mod_01 <- lm(decibels ~ aoa + chord + log_f + velocity, data = ready_df)
+```
+
+The summary of our first model is shown below.  
+
+```{r, show_mod_01_summary}
+mod_01 %>% summary()
+```
+
+We can also visualize the coefficient estimates and their **confidence intervals**.  
+
+```{r, viz_mod_01_coefs}
+mod_01 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none')
+```
+
+### All pair-wise interactions
+
+```{r, fit_mod_02}
+mod_02 <- lm( decibels ~ (aoa + chord + log_f + velocity)^2, data = ready_df )
+```
+
+
+Model summary is printed below.  
+
+```{r, show_mod_02_summary}
+mod_02 %>% summary()
+```
+
+Coefficient estimates and confidence intervals are visualized below.  
+
+```{r, viz_mod_02_coefs}
+mod_02 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none')
+```
+
+### Triplet interactions
+
+```{r, fit_mod_03}
+mod_03 <- lm( decibels ~ (aoa + chord + log_f + velocity)^3, data = ready_df )
+```
+
+
+Model summary.  
+
+```{r, show_mod_03_summary}
+mod_03 %>% summary()
+```
+
+Coefficient summaries.  
+
+```{r, viz_fit_03_coefs}
+mod_03 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none')
+```
+
+### Quadratic polynomial no interactions
+
+```{r, fit_mod_04}
+mod_04 <- lm( decibels ~ aoa + I(aoa^2) + chord + I(chord^2) +
+                log_f + I(log_f^2) + velocity + I(velocity^2),
+              data = ready_df)
+```
+
+
+Model summary.  
+
+```{r, show_mod_04_summary}
+mod_04 %>% summary()
+```
+
+Coefficient summaries.  
+
+```{r, viz_mod_04_coefs}
+mod_04 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none')
+```
+
+### Quadratic polynomial with linear interactions
+
+```{r, fit_mod_05}
+mod_05 <- lm( decibels ~ (aoa + chord + log_f + velocity)^2 + 
+                I(aoa^2) + I(chord^2) + I(log_f^2) + I(velocity^2),
+              data = ready_df)
+```
+
+
+Model summary.  
+
+```{r, show_mod_05_summary}
+mod_05 %>% summary()
+```
+
+Coefficient summaries.  
+
+```{r, viz_mod_05_coefs}
+mod_05 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none')
+```
+
+### Quadratic trend interactions
+
+The EDA revealed that the non-linear relationships with respect to `log_f` depend on the other inputs.  
+
+```{r, fit_mod_06}
+mod_06 <- lm( decibels ~ (aoa * chord * velocity) * (log_f + I(log_f^2)),
+              data = ready_df)
+```
+
+
+Model summary.  
+
+```{r, show_mod_06_summary}
+mod_06 %>% summary()
+```
+
+Coefficient summary visualization.  
+
+```{r, viz_mod_06_coefs}
+mod_06 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none')
+```
+
+### Interactions between quadratics
+
+```{r, fit_mod_07}
+mod_07 <- lm( decibels ~ (aoa + chord + velocity + I(aoa^2) + I(chord^2) + I(velocity^2)) * 
+                (log_f + I(log_f^2)),
+              data = ready_df)
+```
+
+
+Model summary.  
+
+```{r, show_mod_07_summary}
+mod_07 %>% summary()
+```
+
+Coefficient summary visualization.  
+
+```{r, viz_mod_07_coefs}
+mod_07 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none')
+```
+
+### Cubic polynomial with interactions
+
+Try a cubic relationship between the response and the `log_f` input.  
+
+```{r, fit_mod_08}
+mod_08 <- lm( decibels ~ (aoa * chord * velocity) * (log_f + I(log_f^2) + I(log_f^3)),
+              data = ready_df)
+```
+
+
+Model summary.  
+
+```{r, show_mod_08_summary}
+mod_08 %>% summary()
+```
+
+Coefficient summary visualization.  
+
+```{r, viz_mod_08_coefs}
+mod_08 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none')
+```
+
+### Natural splines
+
+Polynomials are easy features to describe and interpret. However, they are not all that flexible and there are certain negative properties associated with them that we will see in more detail later on. We could allow for more flexible behavior without specifying the exact polynomial curve with *splines*. Specifically let's apply a rather high degree-of-freedom **natural spline** to the `log_f` input. The natural spline features will interact with the `aoa`, `chord` and `velocity` linear interaction terms.  
+
+```{r, fit_mod_09}
+mod_09 <- lm( decibels ~ (aoa * chord * velocity) * splines::ns(log_f, df = 7),
+              data = ready_df)
+```
+
+
+This model has a large number of features. We will not print out the model summary. Instead we will display a glimpse of the "tidy format" coefficient results to reveal just how many terms are in this model.  
+
+```{r, show_mod_09_tidy_coef_glimpse}
+mod_09 %>% broom::tidy() %>% glimpse()
+```
+
+There are so many features in this model that it is difficult to look at the coefficient summary visualization!  
+
+```{r, viz_mod_09_coef}
+mod_09 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none')
+```
+
+### Tensor product spline
+
+Try a tensor product between the `aoa` and `log_f` inputs to capture the "grid-like" structure between those two variables.  
+
+```{r, fit_mod_10}
+mod_10 <- lm( decibels ~ (velocity * chord) * 
+                (splines::ns(log_f, df = 5) : splines::ns(aoa, df = 5)),
+              data = ready_df)
+```
+
+
+Again this model has so many features we will just look at a glimpse of the coefficient results.  
+
+```{r, show_mod_10_tidy_coef_glimpse}
+mod_10 %>% broom::tidy() %>% glimpse()
+```
+
+Coefficient summary visualization.  
+
+```{r, viz_mod_10_coefs}
+mod_10 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none')
+```
+
+### Tensor product spline with polynomials
+
+Allow quadratic polynomials in `velocity` and `chord` to interact with the tensor product spline applied to `log_f` and `aoa`.  
+
+```{r, fit_mod_11}
+mod_11 <- lm( decibels ~ (velocity * chord + I(velocity^2) + I(chord^2)) * 
+                (splines::ns(log_f, df = 5) : splines::ns(aoa, df = 5)),
+              data = ready_df)
+```
+
+There are a lot of features in this model.  
+
+```{r, show_mod_11_tidy_coef_glimpse}
+mod_11 %>% broom::tidy() %>% glimpse()
+```
+
+Coefficient summary visualization. The confidence intervals are quite wide for some of the features!  
+
+```{r, viz_mod_11_coefs}
+mod_11 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none')
+```
+
+
+### High degree of freedom tensor products
+
+Use the same model formulation as the previous model, but use 9 degrees of freedom (dof) instead of 5.  
+
+```{r, fit_mod_12}
+mod_12 <- lm( decibels ~ (velocity * chord + I(velocity^2) + I(chord^2)) * 
+                (splines::ns(log_f, df = 9) : splines::ns(aoa, df = 9)),
+              data = ready_df)
+```
+
+
+We have nearly 500 features!  
+
+```{r, show_mod_12_tidy_coef_glimpse}
+mod_12 %>% broom::tidy() %>% glimpse()
+```
+
+Coefficient summary visualization. The feature names were removed to make more space in the figure below. As you we can see we have extreme coefficient estimates!  
+
+```{r, viz_mod_12_coefs}
+mod_12 %>% 
+  coefplot::coefplot() +
+  theme_bw() +
+  theme(legend.position = 'none',
+        axis.text.y = element_blank())
+```
+
+
+## Model comparison
+
+We fit 12 models. We tried a few simple models as well as models with a very large number of features. Which model is better? Extract multiple performance metrics for each model.  
+
+```{r, extract_train_metrics}
+extract_metrics <- function(mod, mod_name)
+{
+  broom::glance(mod) %>% 
+    mutate(model_name = mod_name)
+}
+
+model_results <- purrr::map2_dfr(list(mod_01, mod_02, mod_03, mod_04,
+                                      mod_05, mod_06, mod_07, mod_08,
+                                      mod_09, mod_10, mod_11, mod_12),
+                                 sprintf("mod-%02d", 1:12),
+                                 extract_metrics)
+```
+
+
+Print the R-squared associated with each model. The models are ordered by decreasing R-squared.  
+
+```{r, show_train_rsquared}
+model_results %>% 
+  select(r.squared, model_name) %>% 
+  arrange(desc(r.squared))
+```
+
+Or, we can visualize the training set R-squared values. Which model is the best?  
+
+```{r, viz_train_rsquared}
+model_results %>% 
+  ggplot(mapping = aes(x = model_name, y = r.squared)) +
+  geom_linerange(mapping = aes(ymin = 0,
+                               ymax = r.squared)) +
+  geom_point(size = 4.5) +
+  labs(x = '') +
+  theme_bw()
+```
+
+What if we considered other metrics? Let's compare the performance rankings between the 12 models based on **AIC** and **BIC**. The R-squared is also included for reference. The smaller the AIC and BIC value the better.  Which model is best?  
+
+```{r, viz_train_infometrcs}
+model_results %>% 
+  select(model_name, r.squared, AIC, BIC) %>% 
+  pivot_longer(!c("model_name")) %>% 
+  mutate(model_id = stringr::str_extract(model_name, "\\d+")) %>% 
+  ggplot(mapping = aes(x = model_id, y = value)) +
+  geom_point(size = 3.5) +
+  facet_wrap(~name, scales = "free_y") +
+  labs(x = '') +
+  theme_bw()
+```
+
+## Train-test split
+
+How would the models perform on new data? Or, how well do the models **generalize**?  
+
+Let's approximate "new" data by randomly splitting the data into a dedicated **training** set and a dedicated **hold-out** test set. For simplicity, use the already standardized data set. The splitting is performed below with the base `R` `sample()` function. We will use 80% of the data for training and so reserve 20% of the data for testing.  
+
+```{r, make_train_test_splits}
+set.seed(12341)
+
+train_id <- sample(1:nrow(ready_df), size = floor(0.8 * nrow(ready_df)))
+
+train_ready <- ready_df %>% slice(train_id)
+
+test_ready <- ready_df %>% slice(-train_id)
+```
+
+
+Check the dimensions of the splits.  
+
+```{r, check_train_split_size}
+train_ready %>% dim()
+```
+
+```{r, check_test_split_size}
+test_ready %>% dim()
+```
+
+Define a function that will train and assess the model for us on the both the training and test splits. Use the `yardstick` package to easily calculate the RMSE, MAE, and R-squared metrics.  
+
+```{r, load_yardstick_pkg}
+library(yardstick)
+```
+
+```{r, make_train_function_splits}
+fit_and_assess <- function(a_formula, model_name, train_data, test_data, y_name)
+{
+  mod <- lm( a_formula, data = train_data)
+  
+  pred_train <- as.vector(mod$fitted.values)
+  
+  y_train <- train_data %>% dplyr::select(all_of(y_name)) %>% pull()
+  
+  train_metrics <- tibble::tibble(
+    rmse_value = rmse_vec(y_train, pred_train),
+    mae_value = mae_vec(y_train, pred_train),
+    r2_value = rsq_vec(y_train, pred_train)
+  )
+  
+  pred_test <- as.vector(predict(mod, newdata = test_data))
+  
+  y_test <- test_data %>% dplyr::select(all_of(y_name)) %>% pull()
+  
+  test_metrics <- tibble::tibble(
+    rmse_value = rmse_vec(y_test, pred_test),
+    mae_value = mae_vec(y_test, pred_test),
+    r2_value = rsq_vec(y_test, pred_test)
+  )
+  
+  train_metrics %>% mutate(on_set = "train") %>% 
+    bind_rows(test_metrics %>% mutate(on_set = "test")) %>% 
+    mutate(model_name = model_name)
+}
+```
+
+Train and assess each model.  
+
+```{r, run_one_split_comparison}
+one_split_results <- purrr::map2_dfr(list(formula(mod_01), formula(mod_02), formula(mod_03),
+                                          formula(mod_04), formula(mod_05), formula(mod_06),
+                                          formula(mod_07), formula(mod_08), formula(mod_09),
+                                          formula(mod_10), formula(mod_11), formula(mod_12)),
+                                     sprintf("mod-%02d", 1:12),
+                                     fit_and_assess,
+                                     train_data = train_ready,
+                                     test_data = test_ready,
+                                     y_name = "decibels")
+```
+
+Compare the RMSE values for each model between the training and test splits.  
+
+```{r, viz_rmse_splits_results}
+one_split_results %>% 
+  mutate(model_id = stringr::str_extract(model_name, "\\d+")) %>% 
+  ggplot(mapping = aes(x = model_id, y = rmse_value)) +
+  geom_line(mapping = aes(color = on_set,
+                          group = on_set),
+            size = 1.1) +
+  geom_point(mapping = aes(color = on_set),
+             size = 2.5) +
+  scale_color_brewer("", palette = "Set1") +
+  labs(x = 'model') +
+  theme_bw()
+```
+
+Compare the R-squared values for each model between the training and test splits.  
+
+```{r, viz_rsq_splits_results}
+one_split_results %>% 
+  mutate(model_id = stringr::str_extract(model_name, "\\d+")) %>% 
+  ggplot(mapping = aes(x = model_id, y = r2_value)) +
+  geom_line(mapping = aes(color = on_set,
+                          group = on_set),
+            size = 1.1) +
+  geom_point(mapping = aes(color = on_set),
+             size = 2.5) +
+  scale_color_brewer("", palette = "Set1") +
+  labs(x = 'model') +
+  theme_bw()
+```
+
+## Cross-validation
+
+Model-12 had the best performance on the training set, but had the **worst** performance on the test set! However, this was just a single random split. How consistent are the test set results? Are we confident that model-12 will *always* perform worse on new data? Instead of using a single split, let's repeating the splitting multiple times! We will use **K-fold cross-validation** to check the average performance on (approximate) new data between the twelve models.  
+
+We will use 5-fold cross-validation, and so each **fold** will use 20% of the data for testing.  
+
+We could manually perform the **resampling** ourselves. However, the `rsample` package provides useful functionality to manage all the book keeping for us. The code chunk below creates the folds using the `rsample::vfold_cv()` function.  
+
+```{r, make_cv_folds}
+num_folds <- 5
+
+set.seed(54321)
+
+cv_info <- rsample::vfold_cv(ready_df, v = num_folds, repeats = 1)
+
+cv_info
+```
+
+
+Define a functions to train and evaluate a model within a given resample fold.  
+
+```{r, make_cv_train_assess_func}
+train_and_test_fold <- function(a_split, fold_id, a_formula, model_name, y_name)
+{
+  # extract training set
+  train_data <- as.data.frame(a_split, data = "analysis")
+  
+  # train model on the training set
+  mod <- lm( a_formula, data = train_data )
+  
+  # assess on the training set
+  y_train <- train_data %>% dplyr::select(all_of(y_name)) %>% pull()
+  
+  pred_train <- as.vector(mod$fitted.values)
+  
+  train_metrics <- tibble::tibble(
+    rmse_value = rmse_vec(y_train, pred_train),
+    mae_value = mae_vec(y_train, pred_train),
+    r2_value = rsq_vec(y_train, pred_train)
+  )
+  
+  # extract the test set
+  test_data <- as.data.frame(a_split, data = "assessment")
+  
+  # predict the hold-out test set
+  y_test <- test_data %>% dplyr::select(all_of(y_name)) %>% pull()
+  
+  pred_test <- as.vector( predict(mod, newdata = test_data) )
+  
+  # calculate hold-out set metrics
+  test_metrics <- tibble::tibble(
+    rmse_value = rmse_vec(y_test, pred_test),
+    mae_value = mae_vec(y_test, pred_test),
+    r2_value = rsq_vec(y_test, pred_test)
+  )
+  
+  # book keeping
+  train_metrics %>% mutate(on_set = "train") %>% 
+    bind_rows(test_metrics %>% mutate(on_set = "test")) %>% 
+    mutate(fold_id = fold_id, model_name = model_name)
+}
+```
+
+
+Define a "wrapper" function which loops over the folds for a given model.  
+
+```{r, make_cv_wrapper_func}
+evaluate_cv <- function(a_formula, model_name, resample_info, y_name)
+{
+  purrr::map2_dfr(resample_info$splits,
+                  resample_info$id,
+                  train_and_test_fold,
+                  a_formula = a_formula,
+                  model_name = model_name,
+                  y_name = y_name)
+}
+```
+
+
+Perform the cross-validation for all models. The code chunk below executes all training and assessments in series for simplicity. The execution time is provided for reference.  
+
+```{r, run_cv_all_models}
+my_start <- Sys.time()
+
+my_cv_results <- purrr::map2_dfr(list(formula(mod_01), formula(mod_02), formula(mod_03),
+                                      formula(mod_04), formula(mod_05), formula(mod_06),
+                                      formula(mod_07), formula(mod_08), formula(mod_09),
+                                      formula(mod_10), formula(mod_11), formula(mod_12)),
+                                 sprintf("mod-%02d", 1:12),
+                                 evaluate_cv,
+                                 resample_info = cv_info,
+                                 y_name = "decibels")
+
+my_finish <- Sys.time()
+
+my_finish - my_start
+```
+
+A glimpse of the `my_cv_results` object is provided below. This object is already in a "tidy data" format to make it easy to summarize and visualize the results.  
+
+```{r, show_my_cv_res_glimpse}
+my_cv_results %>% glimpse()
+```
+
+Summarize the RMSE results in the training set and test set across all folds for each model.  
+
+```{r, viz_cv_res_rmse_summary}
+my_cv_results %>% 
+  mutate(model_id = stringr::str_extract(model_name, "\\d+")) %>% 
+  ggplot(mapping = aes(x = model_id, y = rmse_value)) +
+  geom_point(alpha = 0.5,
+             mapping = aes(group = interaction(model_name, on_set),
+                           color = on_set),
+             position = position_dodge(0.2)) +
+  stat_summary(fun.data = "mean_se",
+               mapping = aes(group = interaction(model_name, on_set),
+                             color = on_set),
+               position = position_dodge(0.2)) +
+  scale_color_brewer("", palette = "Set1") +
+  labs(x = 'model', y = 'RMSE') +
+  theme_bw()
+```
+
+Look at the average R-squared value in the training and test splits across all folds for each model.  
+
+```{r, viz_cv_res_rsq_summary}
+my_cv_results %>% 
+  mutate(model_id = stringr::str_extract(model_name, "\\d+")) %>% 
+  ggplot(mapping = aes(x = model_id, y = r2_value)) +
+  geom_point(alpha = 0.5,
+             mapping = aes(group = interaction(model_name, on_set),
+                           color = on_set),
+             position = position_dodge(0.2)) +
+  stat_summary(fun.data = "mean_se",
+               mapping = aes(group = interaction(model_name, on_set),
+                             color = on_set),
+               position = position_dodge(0.2)) +
+  scale_color_brewer("", palette = "Set1") +
+  labs(x = 'model', y = 'RMSE') +
+  theme_bw()
+```
+
+## Pre-processing and Cross-validation
+
+Technically what we did before is **not** correct. We cannot perform the pre-processing outside of the resampling scheme. We must apply the pre-processing steps **within** each fold! It may not be all that big a deal when we only perform standardization, but it is crucial to perform pre-processing in the correct order when we use more advanced pre-processing actions.  
+
+Define functions which correctly standardize the variables based on the **within fold** training set.  
+
+```{r, make_correct_train_assess_funcs}
+train_and_test_with_preprocess <- function(a_split, fold_id, a_formula, model_name, y_name)
+{
+  # extract training set
+  train_data <- as.data.frame(a_split, data = "analysis")
+  
+  # calculate the variable means on the training set
+  var_centers <- as.vector( apply(train_data, 2, mean) )
+  
+  # calculate the variable sds on the training set
+  var_sds <- as.vector( apply(train_data, 2, sd) )
+  
+  var_names <- train_data %>% names()
+  
+  # standardize the inputs and the response
+  train_stan <- train_data %>% 
+    scale(center = var_centers, scale = var_sds) %>% 
+    as.data.frame() %>% tibble::as_tibble() %>% 
+    dplyr::select(all_of(names(train_data)))
+  
+  # train model on the training set
+  mod <- lm( a_formula, data = train_stan )
+  
+  # assess on the training set
+  y_train <- train_data %>% dplyr::select(all_of(y_name)) %>% pull()
+  
+  # rescale the predictions to the same scale as the original output
+  y_center <- var_centers[ which(var_names == y_name) ]
+  y_sd <- var_sds[ which(var_names == y_name) ]
+  
+  pred_train <- y_sd * as.vector(mod$fitted.values) + y_center
+  
+  train_metrics <- tibble::tibble(
+    rmse_value = rmse_vec(y_train, pred_train),
+    mae_value = mae_vec(y_train, pred_train),
+    r2_value = rsq_vec(y_train, pred_train)
+  )
+  
+  # extract the test set
+  test_data <- as.data.frame(a_split, data = "assessment")
+  
+  # standardize based on the training set
+  test_stan <- test_data %>% 
+    scale(center = var_centers, scale = var_sds) %>% 
+    as.data.frame() %>% tibble::as_tibble() %>% 
+    dplyr::select(all_of(names(test_data)))
+  
+  # predict the hold-out test set
+  y_test <- test_data %>% dplyr::select(all_of(y_name)) %>% pull()
+  
+  # rescale the predictions to the original output scale
+  
+  pred_test <- y_sd * as.vector( predict(mod, newdata = test_stan) ) + y_center
+  
+  # calculate hold-out set metrics
+  test_metrics <- tibble::tibble(
+    rmse_value = rmse_vec(y_test, pred_test),
+    mae_value = mae_vec(y_test, pred_test),
+    r2_value = rsq_vec(y_test, pred_test)
+  )
+  
+  # book keeping
+  train_metrics %>% mutate(on_set = "train") %>% 
+    bind_rows(test_metrics %>% mutate(on_set = "test")) %>% 
+    mutate(fold_id = fold_id, model_name = model_name)
+}
+
+### setup the wrapper
+
+evaluate_cv_with_preprocess <- function(a_formula, model_name, resample_info, y_name)
+{
+  purrr::map2_dfr(resample_info$splits,
+                  resample_info$id,
+                  train_and_test_with_preprocess,
+                  a_formula = a_formula,
+                  model_name = model_name,
+                  y_name = y_name)
+}
+```
+
+
+Create a new set of splits based on the original non-standardized variables.  
+
+```{r, make_new_splits_b}
+set.seed(54321)
+
+cv_info_b <- rsample::vfold_cv(df_b, v = num_folds, repeats = 1)
+
+cv_info_b
+```
+
+Execute the cross-validation using the correct pre-processing implementation.  
+
+```{r, run_correct_cv_steps}
+my_start <- Sys.time()
+
+cv_results_b <- purrr::map2_dfr(list(formula(mod_01), formula(mod_02), formula(mod_03),
+                                     formula(mod_04), formula(mod_05), formula(mod_06),
+                                     formula(mod_07), formula(mod_08), formula(mod_09),
+                                     formula(mod_10), formula(mod_11), formula(mod_12)),
+                                sprintf("mod-%02d", 1:12),
+                                evaluate_cv_with_preprocess,
+                                resample_info = cv_info_b,
+                                y_name = "decibels")
+
+my_finish <- Sys.time()
+
+my_finish - my_start
+```
+
+The cross-validation averaged R-squared values per split are shown below. Because our set of pre-processing steps were relatively simple we have the exact same trends as we saw when we did not perform the pre-processing correctly. Again, this is not a big deal right now. However, if we were using dimensionality reduction techniques to extract features from the variables it is critical that we perform the pre-processing correctly.  
+
+```{r, viz_cv_rsq_correct}
+cv_results_b %>% 
+  mutate(model_id = stringr::str_extract(model_name, "\\d+")) %>% 
+  ggplot(mapping = aes(x = model_id, y = r2_value)) +
+  geom_point(alpha = 0.5,
+             mapping = aes(group = interaction(model_name, on_set),
+                           color = on_set),
+             position = position_dodge(0.2)) +
+  stat_summary(fun.data = "mean_se",
+               mapping = aes(group = interaction(model_name, on_set),
+                             color = on_set),
+               position = position_dodge(0.2)) +
+  scale_color_brewer("", palette = "Set1") +
+  labs(x = 'model', y = 'RMSE') +
+  theme_bw()
+```
+
+## Next steps
+
+This seems like a lot of code to compare linear models! This report demonstrated how to perform the major steps (mostly) manually. We will however learn about pre-existing functions that streamline resampling, training, evaluation, and even tuning of models. You will be allowed to use those functions for the applied portions of the course. That said, it is essential to understand the steps being performed behind the scenes! This report gave you glimpse "under the hood" so that you can start to get experience with the key aspects of the model training process.  
